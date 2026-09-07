@@ -1,0 +1,601 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		080EFC21AD27A980655ED72B /* TFTPTransfer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 678F7F9BD55B421159D51249 /* TFTPTransfer.swift */; };
+		0CA994166E3BD8135011224E /* NativeTFTPService.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBB03C064204B87DB457A8BC /* NativeTFTPService.swift */; };
+		11F01264E3AC72B006E0DC9D /* PrivilegedShellRunner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 883C8A6A034FCF0513E468D9 /* PrivilegedShellRunner.swift */; };
+		14D64DFF7B5D8A8AC0D7A512 /* DashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D85D9798E7B7D80FBAB19C2B /* DashboardView.swift */; };
+		151258B8DD7B76318EF933CC /* SystemDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 778EEBBBEE8DC242056F82F4 /* SystemDetector.swift */; };
+		16FC6F44B5CE138647AD7867 /* TFTPStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = DADB1F11C9FA20CCE7024445 /* TFTPStatus.swift */; };
+		2498045B441153233084DDF7 /* OrphanedServerBlockingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EFB7D05A6CBD7CE76DBAA62 /* OrphanedServerBlockingView.swift */; };
+		24A4DD8A2BD4A342D7909343 /* QueueSessionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0996C62C2BFE515F47B9CEA /* QueueSessionTests.swift */; };
+		281C2F7AE449480492D7CB63 /* StatusBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE7F82F877138ACD8303A347 /* StatusBarView.swift */; };
+		411B2D7FF701F0BE0DB436D8 /* PathValidatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D8E3D11CD47B31ABD5E1FA4 /* PathValidatorTests.swift */; };
+		45052B23DCA7F6CF8FF2853B /* TransferProgress.swift in Sources */ = {isa = PBXBuildFile; fileRef = C59BE1C1D166A9B47DA9E15F /* TransferProgress.swift */; };
+		4AFED5128E632C74FB204180 /* TransfersView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D482F8DA6079935F22106E00 /* TransfersView.swift */; };
+		5220A23BE33B760F4B18EDE1 /* HelpView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 954ACEAA702EF3D4EA8D0BE9 /* HelpView.swift */; };
+		52803F0789E0B806AC1E390B /* ProcessKiller.swift in Sources */ = {isa = PBXBuildFile; fileRef = 70B989F7BA32149AA3EA3776 /* ProcessKiller.swift */; };
+		539038731AD5CD8A98B00348 /* LogStreamMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = C96261C42F370C392FC123E3 /* LogStreamMonitor.swift */; };
+		59F2276FD175A4BEBDEAC452 /* DiagnosticResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1655399D5A6974BD297FE86E /* DiagnosticResult.swift */; };
+		5CD4033AABBA54E708FBD3F4 /* TFTPServiceManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAC37DC530FE6C9A1EAE985B /* TFTPServiceManagerTests.swift */; };
+		6ED503619E0AED9D9007FD0C /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 783881C1CB286CD1D2871239 /* AppState.swift */; };
+		76F835D5E0BD56D6EBD52351 /* TFTPServiceControlling.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09973E3318EA41ECE42C1ACB /* TFTPServiceControlling.swift */; };
+		7D828505571C8767697E8CC2 /* HelpTopic.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D764A5401DB27CFE1BF1E45 /* HelpTopic.swift */; };
+		82E273E017619A96846E7AB5 /* TFTPConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDDCFF5CE5CE8464CD3AC704 /* TFTPConfiguration.swift */; };
+		895FAB784A5D7208EB533C53 /* SystemDetectorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 976EBD5BE7CC32BBBF326876 /* SystemDetectorTests.swift */; };
+		8FEBB4B8969CA2988BCDCB7B /* LaunchdManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57B57B1C5DCD33400FF8D8A6 /* LaunchdManager.swift */; };
+		981D657FF0C60E94D247C112 /* TFTPServiceError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 483FAAFA556BDC3132CA069B /* TFTPServiceError.swift */; };
+		A1593D1CF19506E4906BDEE4 /* NetworkInterface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 897629653726BE135CBD9E4B /* NetworkInterface.swift */; };
+		A5D8AC06575528683FE5676C /* NetworkMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41D3642D336C5578F8868245 /* NetworkMonitor.swift */; };
+		A9101381D3FCF17EEEBD8B87 /* TransferActivityParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07851971BAD97C382A036E78 /* TransferActivityParser.swift */; };
+		AA4D6B36E1D9DA660C5F9872 /* FileEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC1544B44B1F82D5341D3053 /* FileEntry.swift */; };
+		AF33038AEA427D503764F5D6 /* LogViewerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 463B279DEBBD1707AA2A6052 /* LogViewerView.swift */; };
+		BEB1142EA1CD9471481B228E /* NetworkByteMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 792DD6120AAAD1AB51279585 /* NetworkByteMonitor.swift */; };
+		C07FAF092A5BF88B5B15EA90 /* QueueSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA7B87DE8E250C32CA2655B5 /* QueueSession.swift */; };
+		C1ABF1BEC0A6165AC1B84471 /* PathValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 348ADAC0ECAFC258D0F02083 /* PathValidator.swift */; };
+		C3B5F9C57FE99985B8745FD5 /* TFTPServerApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAF66CDDA2A63D8B701C6CBA /* TFTPServerApp.swift */; };
+		C6C47E91042DB3B4D249AA02 /* TransferActivityParserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF0178C62A46B1F4E9D68B91 /* TransferActivityParserTests.swift */; };
+		C7DDF2F88A2DEF228468D1F4 /* TransferProgressSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA2BC5114C59EB34EC8EF8C2 /* TransferProgressSheet.swift */; };
+		C909E3CEF22A46D3565BDD49 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 61A05B78422CCF87BB43C3EF /* AppDelegate.swift */; };
+		CF77CB6D9E4F9E80101D7049 /* LogEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = B32319C18B339D04F9CC1AD2 /* LogEntry.swift */; };
+		DEB6C250662F3820925BA44C /* TFTPServiceController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D0537F7734BA5967CF3CC0E /* TFTPServiceController.swift */; };
+		DFD14BA2CDD7CF555B80C03D /* CurrentPathView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC5ADD68E5DFC50D32B07761 /* CurrentPathView.swift */; };
+		E263B2F6F2B83D968E78278E /* ProcessRunner.swift in Sources */ = {isa = PBXBuildFile; fileRef = A49F72BEDAAAD82C092433C2 /* ProcessRunner.swift */; };
+		F43C180A39747FABED87569C /* FileSystemService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A46F7C33827CEE196606A676 /* FileSystemService.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		F65B75B5A3CC0A8427C5C918 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 2E45D127F08B73F0388234DA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 0F8EDAF6B797AE9DD7453942;
+			remoteInfo = TFTPServer;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		07851971BAD97C382A036E78 /* TransferActivityParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransferActivityParser.swift; sourceTree = "<group>"; };
+		09973E3318EA41ECE42C1ACB /* TFTPServiceControlling.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TFTPServiceControlling.swift; sourceTree = "<group>"; };
+		1655399D5A6974BD297FE86E /* DiagnosticResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiagnosticResult.swift; sourceTree = "<group>"; };
+		2D0537F7734BA5967CF3CC0E /* TFTPServiceController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TFTPServiceController.swift; sourceTree = "<group>"; };
+		348ADAC0ECAFC258D0F02083 /* PathValidator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PathValidator.swift; sourceTree = "<group>"; };
+		41D3642D336C5578F8868245 /* NetworkMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkMonitor.swift; sourceTree = "<group>"; };
+		463B279DEBBD1707AA2A6052 /* LogViewerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogViewerView.swift; sourceTree = "<group>"; };
+		483FAAFA556BDC3132CA069B /* TFTPServiceError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TFTPServiceError.swift; sourceTree = "<group>"; };
+		57B57B1C5DCD33400FF8D8A6 /* LaunchdManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchdManager.swift; sourceTree = "<group>"; };
+		5D764A5401DB27CFE1BF1E45 /* HelpTopic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelpTopic.swift; sourceTree = "<group>"; };
+		61A05B78422CCF87BB43C3EF /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		678F7F9BD55B421159D51249 /* TFTPTransfer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TFTPTransfer.swift; sourceTree = "<group>"; };
+		70B989F7BA32149AA3EA3776 /* ProcessKiller.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProcessKiller.swift; sourceTree = "<group>"; };
+		778EEBBBEE8DC242056F82F4 /* SystemDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemDetector.swift; sourceTree = "<group>"; };
+		783881C1CB286CD1D2871239 /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
+		792DD6120AAAD1AB51279585 /* NetworkByteMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkByteMonitor.swift; sourceTree = "<group>"; };
+		7D8E3D11CD47B31ABD5E1FA4 /* PathValidatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PathValidatorTests.swift; sourceTree = "<group>"; };
+		883C8A6A034FCF0513E468D9 /* PrivilegedShellRunner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrivilegedShellRunner.swift; sourceTree = "<group>"; };
+		897629653726BE135CBD9E4B /* NetworkInterface.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkInterface.swift; sourceTree = "<group>"; };
+		954ACEAA702EF3D4EA8D0BE9 /* HelpView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelpView.swift; sourceTree = "<group>"; };
+		976EBD5BE7CC32BBBF326876 /* SystemDetectorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemDetectorTests.swift; sourceTree = "<group>"; };
+		981CBE6B1B7D8DD8EDBDAF9D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		9EFB7D05A6CBD7CE76DBAA62 /* OrphanedServerBlockingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrphanedServerBlockingView.swift; sourceTree = "<group>"; };
+		A46F7C33827CEE196606A676 /* FileSystemService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileSystemService.swift; sourceTree = "<group>"; };
+		A49F72BEDAAAD82C092433C2 /* ProcessRunner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProcessRunner.swift; sourceTree = "<group>"; };
+		B32319C18B339D04F9CC1AD2 /* LogEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogEntry.swift; sourceTree = "<group>"; };
+		BA2BC5114C59EB34EC8EF8C2 /* TransferProgressSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransferProgressSheet.swift; sourceTree = "<group>"; };
+		BAC37DC530FE6C9A1EAE985B /* TFTPServiceManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TFTPServiceManagerTests.swift; sourceTree = "<group>"; };
+		BDDCFF5CE5CE8464CD3AC704 /* TFTPConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TFTPConfiguration.swift; sourceTree = "<group>"; };
+		C55BC1C0E187C94BE1587B35 /* TFTPServerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TFTPServerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		C59BE1C1D166A9B47DA9E15F /* TransferProgress.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransferProgress.swift; sourceTree = "<group>"; };
+		C96261C42F370C392FC123E3 /* LogStreamMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogStreamMonitor.swift; sourceTree = "<group>"; };
+		CA7B87DE8E250C32CA2655B5 /* QueueSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueueSession.swift; sourceTree = "<group>"; };
+		CF0178C62A46B1F4E9D68B91 /* TransferActivityParserTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransferActivityParserTests.swift; sourceTree = "<group>"; };
+		D482F8DA6079935F22106E00 /* TransfersView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransfersView.swift; sourceTree = "<group>"; };
+		D85D9798E7B7D80FBAB19C2B /* DashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardView.swift; sourceTree = "<group>"; };
+		DADB1F11C9FA20CCE7024445 /* TFTPStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TFTPStatus.swift; sourceTree = "<group>"; };
+		DAF66CDDA2A63D8B701C6CBA /* TFTPServerApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TFTPServerApp.swift; sourceTree = "<group>"; };
+		F0996C62C2BFE515F47B9CEA /* QueueSessionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QueueSessionTests.swift; sourceTree = "<group>"; };
+		FBB03C064204B87DB457A8BC /* NativeTFTPService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeTFTPService.swift; sourceTree = "<group>"; };
+		FBBC7FF04059E3C3409F3371 /* TFTPServer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TFTPServer.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		FC1544B44B1F82D5341D3053 /* FileEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileEntry.swift; sourceTree = "<group>"; };
+		FC5ADD68E5DFC50D32B07761 /* CurrentPathView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrentPathView.swift; sourceTree = "<group>"; };
+		FE7F82F877138ACD8303A347 /* StatusBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusBarView.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		0FE8D1E6BB09EDC5FAD92F8A /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				FBB03C064204B87DB457A8BC /* NativeTFTPService.swift */,
+				2D0537F7734BA5967CF3CC0E /* TFTPServiceController.swift */,
+				09973E3318EA41ECE42C1ACB /* TFTPServiceControlling.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		18BEA6FB9D65350E88A4A992 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				61A05B78422CCF87BB43C3EF /* AppDelegate.swift */,
+				783881C1CB286CD1D2871239 /* AppState.swift */,
+				DAF66CDDA2A63D8B701C6CBA /* TFTPServerApp.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		28E5BCB0F6819FABAC8BE58F /* TFTPServer */ = {
+			isa = PBXGroup;
+			children = (
+				981CBE6B1B7D8DD8EDBDAF9D /* Info.plist */,
+				18BEA6FB9D65350E88A4A992 /* App */,
+				D458B5532E7EF3199DD12740 /* Infrastructure */,
+				53A1D98F8419B72C339A1B86 /* Models */,
+				0FE8D1E6BB09EDC5FAD92F8A /* Services */,
+				BE772A20DD76A22F682ABCAC /* Utilities */,
+				87C1AE63842FDFC54749C162 /* Views */,
+			);
+			path = TFTPServer;
+			sourceTree = "<group>";
+		};
+		53A1D98F8419B72C339A1B86 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				1655399D5A6974BD297FE86E /* DiagnosticResult.swift */,
+				FC1544B44B1F82D5341D3053 /* FileEntry.swift */,
+				B32319C18B339D04F9CC1AD2 /* LogEntry.swift */,
+				897629653726BE135CBD9E4B /* NetworkInterface.swift */,
+				CA7B87DE8E250C32CA2655B5 /* QueueSession.swift */,
+				BDDCFF5CE5CE8464CD3AC704 /* TFTPConfiguration.swift */,
+				483FAAFA556BDC3132CA069B /* TFTPServiceError.swift */,
+				DADB1F11C9FA20CCE7024445 /* TFTPStatus.swift */,
+				678F7F9BD55B421159D51249 /* TFTPTransfer.swift */,
+				C59BE1C1D166A9B47DA9E15F /* TransferProgress.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		87C1AE63842FDFC54749C162 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				FC5ADD68E5DFC50D32B07761 /* CurrentPathView.swift */,
+				D85D9798E7B7D80FBAB19C2B /* DashboardView.swift */,
+				5D764A5401DB27CFE1BF1E45 /* HelpTopic.swift */,
+				954ACEAA702EF3D4EA8D0BE9 /* HelpView.swift */,
+				463B279DEBBD1707AA2A6052 /* LogViewerView.swift */,
+				9EFB7D05A6CBD7CE76DBAA62 /* OrphanedServerBlockingView.swift */,
+				FE7F82F877138ACD8303A347 /* StatusBarView.swift */,
+				BA2BC5114C59EB34EC8EF8C2 /* TransferProgressSheet.swift */,
+				D482F8DA6079935F22106E00 /* TransfersView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		BE772A20DD76A22F682ABCAC /* Utilities */ = {
+			isa = PBXGroup;
+			children = (
+				348ADAC0ECAFC258D0F02083 /* PathValidator.swift */,
+			);
+			path = Utilities;
+			sourceTree = "<group>";
+		};
+		BFFCF9635A1224FE842DFAE0 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				FBBC7FF04059E3C3409F3371 /* TFTPServer.app */,
+				C55BC1C0E187C94BE1587B35 /* TFTPServerTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		D458B5532E7EF3199DD12740 /* Infrastructure */ = {
+			isa = PBXGroup;
+			children = (
+				A46F7C33827CEE196606A676 /* FileSystemService.swift */,
+				57B57B1C5DCD33400FF8D8A6 /* LaunchdManager.swift */,
+				C96261C42F370C392FC123E3 /* LogStreamMonitor.swift */,
+				792DD6120AAAD1AB51279585 /* NetworkByteMonitor.swift */,
+				41D3642D336C5578F8868245 /* NetworkMonitor.swift */,
+				883C8A6A034FCF0513E468D9 /* PrivilegedShellRunner.swift */,
+				70B989F7BA32149AA3EA3776 /* ProcessKiller.swift */,
+				A49F72BEDAAAD82C092433C2 /* ProcessRunner.swift */,
+				778EEBBBEE8DC242056F82F4 /* SystemDetector.swift */,
+				07851971BAD97C382A036E78 /* TransferActivityParser.swift */,
+			);
+			path = Infrastructure;
+			sourceTree = "<group>";
+		};
+		E25BE53499075475352B50DD /* TFTPServerTests */ = {
+			isa = PBXGroup;
+			children = (
+				7D8E3D11CD47B31ABD5E1FA4 /* PathValidatorTests.swift */,
+				F0996C62C2BFE515F47B9CEA /* QueueSessionTests.swift */,
+				976EBD5BE7CC32BBBF326876 /* SystemDetectorTests.swift */,
+				BAC37DC530FE6C9A1EAE985B /* TFTPServiceManagerTests.swift */,
+				CF0178C62A46B1F4E9D68B91 /* TransferActivityParserTests.swift */,
+			);
+			path = TFTPServerTests;
+			sourceTree = "<group>";
+		};
+		F15B66A9E217C43402DBE416 = {
+			isa = PBXGroup;
+			children = (
+				28E5BCB0F6819FABAC8BE58F /* TFTPServer */,
+				E25BE53499075475352B50DD /* TFTPServerTests */,
+				BFFCF9635A1224FE842DFAE0 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		0F8EDAF6B797AE9DD7453942 /* TFTPServer */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = B4FBEF01735A672923682604 /* Build configuration list for PBXNativeTarget "TFTPServer" */;
+			buildPhases = (
+				759E366C515B806C7BFDB302 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = TFTPServer;
+			packageProductDependencies = (
+			);
+			productName = TFTPServer;
+			productReference = FBBC7FF04059E3C3409F3371 /* TFTPServer.app */;
+			productType = "com.apple.product-type.application";
+		};
+		5EA7BCAF4E6CE7DE29AC21C6 /* TFTPServerTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 844D38092743B7A5DDDA49FB /* Build configuration list for PBXNativeTarget "TFTPServerTests" */;
+			buildPhases = (
+				0BD14AF602068B2AEB4C9440 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				16BE642588BC0BC9E3225FE5 /* PBXTargetDependency */,
+			);
+			name = TFTPServerTests;
+			packageProductDependencies = (
+			);
+			productName = TFTPServerTests;
+			productReference = C55BC1C0E187C94BE1587B35 /* TFTPServerTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		2E45D127F08B73F0388234DA /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+				};
+			};
+			buildConfigurationList = 504254206355F490BE598D8E /* Build configuration list for PBXProject "TFTPServer" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = F15B66A9E217C43402DBE416;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = BFFCF9635A1224FE842DFAE0 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				0F8EDAF6B797AE9DD7453942 /* TFTPServer */,
+				5EA7BCAF4E6CE7DE29AC21C6 /* TFTPServerTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		0BD14AF602068B2AEB4C9440 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				411B2D7FF701F0BE0DB436D8 /* PathValidatorTests.swift in Sources */,
+				24A4DD8A2BD4A342D7909343 /* QueueSessionTests.swift in Sources */,
+				895FAB784A5D7208EB533C53 /* SystemDetectorTests.swift in Sources */,
+				5CD4033AABBA54E708FBD3F4 /* TFTPServiceManagerTests.swift in Sources */,
+				C6C47E91042DB3B4D249AA02 /* TransferActivityParserTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		759E366C515B806C7BFDB302 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C909E3CEF22A46D3565BDD49 /* AppDelegate.swift in Sources */,
+				6ED503619E0AED9D9007FD0C /* AppState.swift in Sources */,
+				DFD14BA2CDD7CF555B80C03D /* CurrentPathView.swift in Sources */,
+				14D64DFF7B5D8A8AC0D7A512 /* DashboardView.swift in Sources */,
+				59F2276FD175A4BEBDEAC452 /* DiagnosticResult.swift in Sources */,
+				AA4D6B36E1D9DA660C5F9872 /* FileEntry.swift in Sources */,
+				F43C180A39747FABED87569C /* FileSystemService.swift in Sources */,
+				7D828505571C8767697E8CC2 /* HelpTopic.swift in Sources */,
+				5220A23BE33B760F4B18EDE1 /* HelpView.swift in Sources */,
+				8FEBB4B8969CA2988BCDCB7B /* LaunchdManager.swift in Sources */,
+				CF77CB6D9E4F9E80101D7049 /* LogEntry.swift in Sources */,
+				539038731AD5CD8A98B00348 /* LogStreamMonitor.swift in Sources */,
+				AF33038AEA427D503764F5D6 /* LogViewerView.swift in Sources */,
+				0CA994166E3BD8135011224E /* NativeTFTPService.swift in Sources */,
+				BEB1142EA1CD9471481B228E /* NetworkByteMonitor.swift in Sources */,
+				A1593D1CF19506E4906BDEE4 /* NetworkInterface.swift in Sources */,
+				A5D8AC06575528683FE5676C /* NetworkMonitor.swift in Sources */,
+				2498045B441153233084DDF7 /* OrphanedServerBlockingView.swift in Sources */,
+				C1ABF1BEC0A6165AC1B84471 /* PathValidator.swift in Sources */,
+				11F01264E3AC72B006E0DC9D /* PrivilegedShellRunner.swift in Sources */,
+				52803F0789E0B806AC1E390B /* ProcessKiller.swift in Sources */,
+				E263B2F6F2B83D968E78278E /* ProcessRunner.swift in Sources */,
+				C07FAF092A5BF88B5B15EA90 /* QueueSession.swift in Sources */,
+				281C2F7AE449480492D7CB63 /* StatusBarView.swift in Sources */,
+				151258B8DD7B76318EF933CC /* SystemDetector.swift in Sources */,
+				82E273E017619A96846E7AB5 /* TFTPConfiguration.swift in Sources */,
+				C3B5F9C57FE99985B8745FD5 /* TFTPServerApp.swift in Sources */,
+				DEB6C250662F3820925BA44C /* TFTPServiceController.swift in Sources */,
+				76F835D5E0BD56D6EBD52351 /* TFTPServiceControlling.swift in Sources */,
+				981D657FF0C60E94D247C112 /* TFTPServiceError.swift in Sources */,
+				16FC6F44B5CE138647AD7867 /* TFTPStatus.swift in Sources */,
+				080EFC21AD27A980655ED72B /* TFTPTransfer.swift in Sources */,
+				A9101381D3FCF17EEEBD8B87 /* TransferActivityParser.swift in Sources */,
+				45052B23DCA7F6CF8FF2853B /* TransferProgress.swift in Sources */,
+				C7DDF2F88A2DEF228468D1F4 /* TransferProgressSheet.swift in Sources */,
+				4AFED5128E632C74FB204180 /* TransfersView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		16BE642588BC0BC9E3225FE5 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 0F8EDAF6B797AE9DD7453942 /* TFTPServer */;
+			targetProxy = F65B75B5A3CC0A8427C5C918 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		5C20D1401CDC535E928B2E69 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MARKETING_VERSION = 0.1.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 6.0;
+			};
+			name = Debug;
+		};
+		5EEB4EC590D62452ECBF58AC /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				COMBINE_HIDPI_IMAGES = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = TFTPServer/Info.plist;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.jensyleo.tftpserver;
+				PRODUCT_NAME = TFTPServer;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		6826F1F6F9145110A2456B0C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MARKETING_VERSION = 0.1.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 6.0;
+			};
+			name = Release;
+		};
+		8CF4E6632D502F356D86BFF0 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.jensyleo.tftpserver.tests;
+				SDKROOT = macosx;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/TFTPServer.app/Contents/MacOS/TFTPServer";
+			};
+			name = Release;
+		};
+		A57FBC1A0424DC451ABF52A3 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				COMBINE_HIDPI_IMAGES = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.jensyleo.tftpserver.tests;
+				SDKROOT = macosx;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/TFTPServer.app/Contents/MacOS/TFTPServer";
+			};
+			name = Debug;
+		};
+		C94C9B09441A2043CE0C7244 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				COMBINE_HIDPI_IMAGES = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = TFTPServer/Info.plist;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.jensyleo.tftpserver;
+				PRODUCT_NAME = TFTPServer;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		504254206355F490BE598D8E /* Build configuration list for PBXProject "TFTPServer" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5C20D1401CDC535E928B2E69 /* Debug */,
+				6826F1F6F9145110A2456B0C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		844D38092743B7A5DDDA49FB /* Build configuration list for PBXNativeTarget "TFTPServerTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A57FBC1A0424DC451ABF52A3 /* Debug */,
+				8CF4E6632D502F356D86BFF0 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		B4FBEF01735A672923682604 /* Build configuration list for PBXNativeTarget "TFTPServer" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5EEB4EC590D62452ECBF58AC /* Debug */,
+				C94C9B09441A2043CE0C7244 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 2E45D127F08B73F0388234DA /* Project object */;
+}
