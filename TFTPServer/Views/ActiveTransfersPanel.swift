@@ -155,10 +155,21 @@ struct DetectingTransfersPanel: View {
             VStack(alignment: .leading, spacing: 8) {
                 Label("Detecting \(transfers.count) transfer\(transfers.count == 1 ? "" : "s")…", systemImage: "arrow.up.arrow.down.circle")
                     .font(.caption.weight(.medium))
-                ForEach(transfers) { transfer in
-                    TransferCard(transfer: transfer)
+                // Mismo tope que los paneles de Downloads/Uploads — sin
+                // esto, un bug real encontrado en vivo (2026-09-08, 50
+                // archivos diminutos que quedaron atascados aquí sin
+                // resolver su dirección) empujaba el botón "Done" fuera de
+                // la pantalla, sin scroll interno que lo alcanzara.
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 8) {
+                        ForEach(transfers) { transfer in
+                            TransferCard(transfer: transfer)
+                        }
+                    }
                 }
+                .frame(maxHeight: 380)
                 if allTransfersFinished {
+                    Divider()
                     HStack {
                         Spacer()
                         Button("Done") {

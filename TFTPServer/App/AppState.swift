@@ -407,7 +407,7 @@ final class AppState: ObservableObject {
             while !Task.isCancelled {
                 guard let self else { return }
                 guard let counts = await NetworkByteMonitor.byteCounts(forPID: pid) else {
-                    self.finalizeTransfer(pid: pid)
+                    self.finalizeTransfer(pid: pid, knownDownloadSize: knownDownloadSize)
                     return
                 }
                 self.updateTransfer(pid: pid, counts: counts, knownDownloadSize: knownDownloadSize)
@@ -480,7 +480,19 @@ final class AppState: ObservableObject {
     /// subidas de ~1GB terminando en <1s). Si eso pasa, se resuelve aquí con
     /// el último conteo conocido, sin exigir el margen de 2x — al terminar el
     /// proceso, cualquier byte movido ya identifica la dirección real.
-    private func finalizeTransfer(pid: Int32) {
+    /// Bug real encontrado en vivo (2026-09-08): con 50 transferencias de
+    /// archivos diminutos (21 bytes) seguidas, TODAS quedaron atascadas para
+    /// siempre en el panel "Detecting" — nunca se resolvió su dirección. La
+    /// causa: un archivo tan pequeño se transfiere y el proceso `tftpd`
+    /// termina antes de que el primer sondeo de `nettop` (cada 150ms en
+    /// `trackTransfer`) alcance a tomar una sola muestra, así que
+    /// `lastByteCounts[pid]` nunca se llena — el respaldo de abajo (que
+    /// compara bytesOut/bytesIn) no tiene con qué trabajar. Segundo
+    /// respaldo: si el archivo ya existía en el TFTP root al detectar la
+    /// transferencia (`knownDownloadSize` no nulo), es casi seguro una
+    /// descarga — nadie pide leer un archivo por su nombre para luego
+    /// escribirlo con ese mismo comando.
+    private func finalizeTransfer(pid: Int32, knownDownloadSize: Int64? = nil) {
         guard var transfer = activeTransfers[pid], transfer.status == .inProgress else { return }
 
         if transfer.direction == nil, let counts = lastByteCounts[pid], counts.bytesOut != counts.bytesIn {
@@ -492,6 +504,12 @@ final class AppState: ObservableObject {
                 transfer.transferredBytes = counts.bytesIn
                 transfer.totalBytes = nil // ver nota en `updateTransfer`
             }
+        }
+
+        if transfer.direction == nil, let knownDownloadSize {
+            transfer.direction = .download
+            transfer.transferredBytes = knownDownloadSize
+            transfer.totalBytes = knownDownloadSize
         }
 
         transfer.status = .completed
