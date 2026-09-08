@@ -44,4 +44,28 @@ struct FileSystemService: Sendable {
         }
         return fileManager.isReadableFile(atPath: directory.path)
     }
+
+    /// Agrega lectura+ejecución para el dueño (necesarias para listar y
+    /// atravesar el directorio) sin tocar el resto de los bits existentes —
+    /// deliberadamente no fuerza `0o755`, que sobrescribiría permisos de
+    /// grupo/otros que el usuario pudo haber configurado a propósito. Falla
+    /// (y no hace nada) si el directorio no existe o pertenece a otro
+    /// usuario — esta app corre como el usuario actual, sin privilegios para
+    /// tocar archivos ajenos, y no debe pedir autorización solo para esto.
+    func repairPermissions(_ directory: URL) -> Bool {
+        let fileManager = FileManager.default
+        var isDirectory: ObjCBool = false
+        guard fileManager.fileExists(atPath: directory.path, isDirectory: &isDirectory), isDirectory.boolValue else {
+            return false
+        }
+        let attributes = try? fileManager.attributesOfItem(atPath: directory.path)
+        let currentMode = (attributes?[.posixPermissions] as? NSNumber)?.intValue ?? 0
+        let repairedMode = currentMode | 0o500
+        do {
+            try fileManager.setAttributes([.posixPermissions: repairedMode], ofItemAtPath: directory.path)
+        } catch {
+            return false
+        }
+        return fileManager.isReadableFile(atPath: directory.path)
+    }
 }

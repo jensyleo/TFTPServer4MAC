@@ -31,19 +31,33 @@ struct StatusBarView: View {
             }
             .frame(maxWidth: .infinity)
             Divider()
-            statusColumn(
-                title: "Working path permissions",
-                systemImage: appState.workingPathPermissionsOK ? "checkmark.circle.fill" : "exclamationmark.circle.fill",
-                tint: appState.workingPathPermissionsOK ? .green : .orange,
-                text: appState.workingPathPermissionsOK ? "Attributes OK" : "Fix needed"
-            )
+            VStack(spacing: 6) {
+                statusColumn(
+                    title: "Working path permissions",
+                    systemImage: appState.workingPathPermissionsOK ? "checkmark.circle.fill" : "exclamationmark.circle.fill",
+                    tint: appState.workingPathPermissionsOK ? .green : .orange,
+                    text: appState.workingPathPermissionsOK ? "Attributes OK" : "Fix needed"
+                )
+                if !appState.workingPathPermissionsOK {
+                    Button("Fix") { appState.repairWorkingPathPermissions() }
+                        .controlSize(.small)
+                }
+            }
+            .frame(maxWidth: .infinity)
             Divider()
-            statusColumn(
-                title: "Parent folder permissions",
-                systemImage: appState.parentFolderPermissionsOK ? "checkmark.circle.fill" : "exclamationmark.circle.fill",
-                tint: appState.parentFolderPermissionsOK ? .green : .orange,
-                text: appState.parentFolderPermissionsOK ? "Attributes OK" : "Fix needed"
-            )
+            VStack(spacing: 6) {
+                statusColumn(
+                    title: "Parent folder permissions",
+                    systemImage: appState.parentFolderPermissionsOK ? "checkmark.circle.fill" : "exclamationmark.circle.fill",
+                    tint: appState.parentFolderPermissionsOK ? .green : .orange,
+                    text: appState.parentFolderPermissionsOK ? "Attributes OK" : "Fix needed"
+                )
+                if !appState.parentFolderPermissionsOK {
+                    Button("Fix") { appState.repairParentFolderPermissions() }
+                        .controlSize(.small)
+                }
+            }
+            .frame(maxWidth: .infinity)
         }
         .padding(.vertical, 10)
         .background(.bar)
