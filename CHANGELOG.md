@@ -2,6 +2,12 @@
 
 All notable changes to this project are documented in this file.
 
+## [1.0.1] - 2026-09-08
+
+### Fixed
+
+- "Quit App" on the orphaned-server screen closed the app leaving the daemon running, with no indication that's what would happen. Now asks for confirmation first, stating plainly that the server stays active and reachable until the app is reopened and stopped, or the Mac restarts.
+
 ## [1.0.0] - 2026-09-08
 
 First stable release. No functional changes from 0.1.1 — every feature listed in 0.1.0 and 0.1.1 has now been exercised live end-to-end (concurrent transfers, permission repair, client IP capture, root-folder validation, integrity verified with MD5/SHA1 on multi-gigabyte transfers), with no known outstanding issues.
