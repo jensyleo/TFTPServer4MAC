@@ -15,3 +15,8 @@ xcuserdata/
 # XcodeGen-generated project (regenerate with `xcodegen generate`)
 *.xcodeproj/project.xcworkspace/
 *.xcodeproj/xcuserdata/
+
+# Internal development notes — Spanish-language working docs, not for
+# public release. Deliberately excluded from git history (2026-09-08).
+PROJECT.md
+TFTPServerResearch/
