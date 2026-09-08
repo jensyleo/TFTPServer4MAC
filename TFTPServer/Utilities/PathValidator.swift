@@ -45,6 +45,20 @@ enum PathValidator {
             return false
         }
 
+        // Bug real encontrado en vivo (2026-09-08): la raíz del servidor
+        // terminó siendo literalmente "/" — la lista de prefijos prohibidos
+        // de arriba no cubre la raíz del sistema completo ni sus carpetas de
+        // primer nivel (`/Users`, `/Applications`, `/Volumes`...), así que
+        // nada la rechazaba. Con eso como root, cualquier archivo del disco
+        // marcado "legible por todos" queda potencialmente servible por
+        // TFTP — exactamente lo que una carpeta raíz acotada debía evitar.
+        // Se exige al menos 2 componentes de ruta reales (p. ej.
+        // `/Users/nombre`), no solo "no es una ruta prohibida específica".
+        let pathComponents = standardizedPath.split(separator: "/", omittingEmptySubsequences: true)
+        guard pathComponents.count >= 2 else {
+            return false
+        }
+
         var isDirectory: ObjCBool = false
         guard fileManager.fileExists(atPath: standardizedPath, isDirectory: &isDirectory),
               isDirectory.boolValue else {

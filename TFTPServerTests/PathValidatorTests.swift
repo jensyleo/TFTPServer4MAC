@@ -28,6 +28,15 @@ final class PathValidatorTests: XCTestCase {
         XCTAssertFalse(PathValidator.isValidRoot(missing))
     }
 
+    /// Bug real encontrado en vivo (2026-09-08): la raíz del servidor
+    /// terminó siendo "/" y nada lo rechazaba — cualquier archivo del disco
+    /// marcado "legible por todos" habría quedado servible por TFTP.
+    func testRejectsFilesystemRootAndTopLevelDirectories() {
+        XCTAssertFalse(PathValidator.isValidRoot(URL(fileURLWithPath: "/")))
+        XCTAssertFalse(PathValidator.isValidRoot(URL(fileURLWithPath: "/Users")))
+        XCTAssertFalse(PathValidator.isValidRoot(URL(fileURLWithPath: "/Applications")))
+    }
+
     /// Auditoría de seguridad (2026-09-07): sin este rechazo, una carpeta con
     /// un salto de línea en el nombre podía terminar antes de tiempo el
     /// heredoc de shell que `NativeTFTPService` ejecuta con privilegios de
