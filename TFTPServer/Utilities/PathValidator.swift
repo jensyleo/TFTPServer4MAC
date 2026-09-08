@@ -27,6 +27,20 @@ enum PathValidator {
             return false
         }
 
+        // Vulnerabilidad real corregida (2026-09-07, auditoría de seguridad):
+        // `NativeTFTPService` interpola esta ruta sin escapar dentro del XML
+        // del plist y dentro de un heredoc de shell ejecutado con privilegios
+        // de administrador. Una carpeta cuyo nombre contuviera un salto de
+        // línea seguido del delimitador exacto del heredoc podría inyectar
+        // comandos arbitrarios como root; caracteres de control en general
+        // no tienen ninguna razón legítima de aparecer en una ruta de
+        // carpeta. Se rechazan aquí, en el único punto de validación común a
+        // todo el flujo, en vez de depender solo del escapado en el
+        // consumidor.
+        guard !standardizedPath.unicodeScalars.contains(where: { CharacterSet.controlCharacters.contains($0) }) else {
+            return false
+        }
+
         guard disallowedPrefixes.allSatisfy({ !standardizedPath.hasPrefix($0) }) else {
             return false
         }

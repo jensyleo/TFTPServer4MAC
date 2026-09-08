@@ -56,14 +56,22 @@ actor NativeTFTPService: TFTPServiceControlling {
             throw TFTPServiceError.conflictingSystemService
         }
 
-        let plistXML = Self.plistContents(
-            root: currentConfiguration.rootDirectory,
-            allowWrites: currentConfiguration.allowUploads || currentConfiguration.allowCreateFiles
-        )
+        // El plist viaja codificado en base64 en vez de en un heredoc de
+        // shell (vulnerabilidad real corregida, 2026-09-07, auditoría de
+        // seguridad): un heredoc con delimitador sin comillas simples
+        // permite expansión de variables/comandos, y aun con el delimitador
+        // entre comillas simples ('TFTPSERVER_PLIST_EOF', como estaba antes)
+        // seguía siendo posible terminarlo antes de tiempo si el contenido
+        // (en la práctica, `root.path`) contuviera un salto de línea seguido
+        // exactamente de ese delimitador — inyectando comandos arbitrarios
+        // ejecutados como administrador. base64 solo produce el alfabeto
+        // [A-Za-z0-9+/=], sin metacaracteres de shell ni saltos de línea
+        // relevantes, así que esta clase de inyección queda cerrada sin
+        // importar el contenido del plist.
+        let plistXML = Self.plistContents(root: currentConfiguration.rootDirectory)
+        let plistBase64 = Data(plistXML.utf8).base64EncodedString()
         let writeAndLoadCommand = """
-        cat > \(Self.ownPlistPath) << 'TFTPSERVER_PLIST_EOF'
-        \(plistXML)
-        TFTPSERVER_PLIST_EOF
+        echo \(plistBase64) | base64 -D -o \(Self.ownPlistPath)
         launchctl load -w \(Self.ownPlistPath)
         """
 
@@ -97,20 +105,11 @@ actor NativeTFTPService: TFTPServiceControlling {
         }
     }
 
-    func restart() async throws {
-        try await stop()
-        try await start()
-    }
-
     func status() async -> TFTPStatus {
         guard let registered = try? await launchdManager.isRegistered(label: Self.ownLabel) else {
             return .unknown
         }
         return registered ? .running : .stopped
-    }
-
-    func configuration() async throws -> TFTPConfiguration {
-        currentConfiguration
     }
 
     func updateConfiguration(_ configuration: TFTPConfiguration) async throws {
@@ -123,16 +122,15 @@ actor NativeTFTPService: TFTPServiceControlling {
         // en vez de recargar el plist de forma implícita aquí.
     }
 
-    /// Traducción honesta de `TFTPConfiguration` a flags reales de `tftpd`:
+    /// `-w` (crear archivos nuevos por WRQ) se eliminó del plist por completo
+    /// (2026-09-07): confirmado en vivo que no funciona de forma confiable en
+    /// este modo — ver PROJECT.md ("`-w` no funciona de forma confiable fuera
+    /// de modo chroot") para el hallazgo completo y la investigación
+    /// pendiente sobre `-s`/`-u`. La única forma real de recibir una subida
+    /// es que el archivo destino ya exista y sea "publicly writable" — eso sí
+    /// funciona siempre, sin ningún flag, y es lo único que esta app puede
+    /// prometer hoy.
     ///
-    /// - **`allowUploads`/`allowCreateFiles` → `-w`**: sin `-w`, el daemon
-    ///   nunca crea archivos nuevos, pero SÍ permite sobrescribir un archivo
-    ///   ya existente si es "publicly writable" (permisos de escritura para
-    ///   todos) — verificado en vivo (2026-09-04). Es una limitación real del
-    ///   binario nativo: la app no puede bloquear al 100% las subidas sin
-    ///   `-w` si el usuario tiene archivos con permisos de escritura amplios
-    ///   en su TFTP root. Se documenta aquí en vez de fingir un control que
-    ///   no existe.
     /// `UserName` hace que launchd baje privilegios de root al usuario actual
     /// para el proceso `tftpd` DESPUÉS de hacer `bind()` en el puerto
     /// privilegiado 69 (eso lo hace launchd mismo, como root, antes del
@@ -141,8 +139,7 @@ actor NativeTFTPService: TFTPServiceControlling {
     /// autorización — el proceso es del mismo usuario que la GUI. Cambio
     /// motivado por feedback del usuario (2026-09-04): pedir contraseña para
     /// cancelar "no tenía sentido".
-    private static func plistContents(root: URL, allowWrites: Bool) -> String {
-        let writeFlag = allowWrites ? "\n                <string>-w</string>" : ""
+    private static func plistContents(root: URL) -> String {
         return """
         <?xml version="1.0" encoding="UTF-8"?>
         <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
@@ -151,14 +148,14 @@ actor NativeTFTPService: TFTPServiceControlling {
             <key>Label</key>
             <string>\(ownLabel)</string>
             <key>UserName</key>
-            <string>\(NSUserName())</string>
+            <string>\(xmlEscaped(NSUserName()))</string>
             <key>ProgramArguments</key>
             <array>
                 <string>/usr/libexec/tftpd</string>
                 <string>-i</string>
-                <string>\(root.path)</string>
+                <string>\(xmlEscaped(root.path))</string>
                 <string>-l</string>
-                <string>-d15</string>\(writeFlag)
+                <string>-d15</string>
             </array>
             <key>Sockets</key>
             <dict>
@@ -178,5 +175,22 @@ actor NativeTFTPService: TFTPServiceControlling {
         </dict>
         </plist>
         """
+    }
+
+    /// Vulnerabilidad real corregida (2026-09-07, auditoría de seguridad):
+    /// `root.path` (elegido por el usuario vía "Change Path", o el nombre de
+    /// cualquier carpeta a la que apunte) se interpolaba sin escapar dentro
+    /// de este XML. Un nombre de carpeta que contuviera literalmente algo
+    /// como `</string></array><key>ProgramArguments</key>...` habría podido
+    /// reescribir claves del plist — incluyendo qué proceso lanza `launchd`
+    /// como root. Escapar las 5 entidades XML básicas cierra esa vía sin
+    /// afectar rutas normales.
+    private static func xmlEscaped(_ value: String) -> String {
+        value
+            .replacingOccurrences(of: "&", with: "&amp;")
+            .replacingOccurrences(of: "<", with: "&lt;")
+            .replacingOccurrences(of: ">", with: "&gt;")
+            .replacingOccurrences(of: "\"", with: "&quot;")
+            .replacingOccurrences(of: "'", with: "&apos;")
     }
 }

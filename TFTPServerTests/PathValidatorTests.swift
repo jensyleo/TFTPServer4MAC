@@ -27,4 +27,25 @@ final class PathValidatorTests: XCTestCase {
         let missing = URL(fileURLWithPath: "/tmp/definitely-does-not-exist-\(UUID().uuidString)")
         XCTAssertFalse(PathValidator.isValidRoot(missing))
     }
+
+    /// Auditoría de seguridad (2026-09-07): sin este rechazo, una carpeta con
+    /// un salto de línea en el nombre podía terminar antes de tiempo el
+    /// heredoc de shell que `NativeTFTPService` ejecuta con privilegios de
+    /// administrador, inyectando comandos arbitrarios como root. Se rechaza
+    /// cualquier carácter de control, no solo `\n`, por ser el punto de
+    /// validación común a todo el flujo.
+    func testRejectsControlCharactersInPath() throws {
+        let base = FileManager.default.temporaryDirectory
+            .appendingPathComponent("PathValidatorTests-\(UUID().uuidString)")
+        try FileManager.default.createDirectory(at: base, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: base) }
+
+        let withNewline = URL(fileURLWithPath: base.path + "\nTFTPSERVER_PLIST_EOF\nrm -rf /")
+        XCTAssertFalse(PathValidator.isValidRoot(withNewline))
+
+        // La carpeta real, sin el sufijo malicioso, sigue siendo válida —
+        // confirma que el rechazo es por el carácter de control, no por
+        // casualidad de la ruta.
+        XCTAssertTrue(PathValidator.isValidRoot(base))
+    }
 }

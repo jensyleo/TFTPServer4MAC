@@ -9,8 +9,6 @@ import Foundation
 protocol TFTPServiceControlling: Sendable {
     func start() async throws
     func stop() async throws
-    func restart() async throws
     func status() async -> TFTPStatus
-    func configuration() async throws -> TFTPConfiguration
     func updateConfiguration(_ configuration: TFTPConfiguration) async throws
 }
