@@ -2,6 +2,20 @@
 
 All notable changes to this project are documented in this file.
 
+## [0.1.1] - 2026-09-08
+
+### Added
+
+- "Detecting" panel now caps its height with its own scroll view, matching the Downloads/Uploads panels.
+
+### Changed
+
+- "Change Path" is now disabled while the server is running, instead of accepting a change that only takes effect after a restart.
+
+### Fixed
+
+- A batch of very small, fast transfers (found live with 50 sequential tiny downloads) could get stuck permanently in the "Detecting" panel — their direction never resolved because they completed faster than the first progress poll. A second fallback now infers direction from whether the requested file already existed when the transfer was detected.
+
 ## [0.1.0] - 2026-09-08
 
 Initial public release.
