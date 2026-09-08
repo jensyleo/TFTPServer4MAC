@@ -16,8 +16,7 @@ enum TFTPServiceError: Error, Equatable {
     case conflictingSystemService
     case requiresUserApproval
     case firewallIssue
-    case serverNotRunning
-    case emptyQueueFolder
+    case permissionsRepairFailed
     case unknown
 
     var userFacingMessage: String {
@@ -40,10 +39,8 @@ enum TFTPServiceError: Error, Equatable {
             return "Open System Settings → General → Login Items & Extensions and allow TFTP Server, then try again."
         case .firewallIssue:
             return "The firewall may be blocking incoming TFTP traffic."
-        case .serverNotRunning:
-            return "Start the TFTP server before starting a queue."
-        case .emptyQueueFolder:
-            return "The TFTP folder has no files to queue."
+        case .permissionsRepairFailed:
+            return "Couldn't fix this folder's permissions — it may belong to a different user. Try fixing it from Terminal or Finder's Get Info panel."
         case .unknown:
             return "An unknown error occurred."
         }

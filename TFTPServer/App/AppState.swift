@@ -13,13 +13,16 @@ final class AppState: ObservableObject {
     @Published var networkInterfaces: [NetworkInterface] = []
     @Published var selectedInterfaceID: String?
     @Published var transfers: [TFTPTransfer] = []
-    @Published var diagnostics: [DiagnosticResult] = []
     @Published var lastError: TFTPServiceError?
     @Published var files: [FileEntry] = []
     @Published var logEntries: [LogEntry] = []
     @Published var workingPathPermissionsOK = true
     @Published var parentFolderPermissionsOK = true
-    @Published var activeTransfer: TransferProgress?
+    /// Una entrada por proceso `tftpd` real actualmente en curso — el daemon
+    /// nativo sí atiende múltiples clientes en paralelo (confirmado en vivo,
+    /// 2026-09-07), así que la app debe poder mostrarlos todos, no solo el
+    /// último detectado. Keyed por PID (ver `TransferProgress.pid`).
+    @Published var activeTransfers: [Int32: TransferProgress] = [:]
     /// `true` cuando, al arrancar, se detecta que el servidor ya estaba
     /// corriendo desde una sesión anterior que no cerró limpiamente (p. ej.
     /// Force Quit / kill -9, que no permite ejecutar ningún código de
@@ -27,19 +30,85 @@ final class AppState: ObservableObject {
     /// usuario autorice detenerlo, por decisión explícita del usuario
     /// (2026-09-04): nunca continuar en silencio con un daemon huérfano.
     @Published var isBlockedByOrphanedServer = false
-    @Published var queueSession: QueueSession?
 
     private let serviceController: TFTPServiceController
     private let networkMonitor = NetworkMonitor()
     private let fileSystemService = FileSystemService()
     private let logStreamMonitor = LogStreamMonitor()
-    private var transferTrackingTask: Task<Void, Never>?
-    private var lastSpeedSample: (bytes: Int64, date: Date)?
+    private var trackingTasks: [Int32: Task<Void, Never>] = [:]
+    private var lastSpeedSamples: [Int32: (bytes: Int64, date: Date)] = [:]
+    /// Último conteo de bytes visto por PID — permite resolver la dirección
+    /// al finalizar cuando la transferencia terminó antes de que
+    /// `updateTransfer` alcanzara a verla cruzar el umbral normal (ver
+    /// `finalizeTransfer`).
+    private var lastByteCounts: [Int32: NetworkByteMonitor.ByteCounts] = [:]
 
     init(serviceController: TFTPServiceController = TFTPServiceController(service: NativeTFTPService())) {
         self.serviceController = serviceController
         self.configuration = .conservativeDefault
         log(.application, "TFTP Server launched")
+    }
+
+    /// Progreso combinado de todas las descargas de esta sesión (en curso o
+    /// ya completadas, mientras sigan visibles sin descartar) con tamaño
+    /// conocido — subidas se excluyen: no hay total confiable que sumar (ver
+    /// PROJECT.md sección 49). `nil` si no hay ninguna descarga con tamaño
+    /// conocido.
+    ///
+    /// Incluye completadas a propósito (no solo `.inProgress`): si se
+    /// excluyeran, el % global "retrocedería" cada vez que una descarga
+    /// termina (el numerador y denominador perderían sus bytes de golpe) en
+    /// vez de avanzar de forma acumulativa — bug real reportado en vivo
+    /// (2026-09-07) con 2 descargas simultáneas.
+    var globalDownloadFraction: Double? {
+        let downloads = activeTransfers.values.filter {
+            $0.direction == .download && $0.totalBytes != nil
+                && ($0.status == .inProgress || $0.status == .completed)
+        }
+        guard !downloads.isEmpty else { return nil }
+        let totalBytes = downloads.reduce(0) { $0 + ($1.totalBytes ?? 0) }
+        guard totalBytes > 0 else { return nil }
+        let transferredBytes = downloads.reduce(0) { $0 + $1.transferredBytes }
+        return min(1.0, Double(transferredBytes) / Double(totalBytes))
+    }
+
+    /// Subidas activas o completadas: sin porcentaje (no hay total confiable
+    /// — ver PROJECT.md sección 49), pero sí un conteo y total de bytes
+    /// recibidos, para no dejarlas completamente invisibles frente a las
+    /// descargas.
+    var uploadsSummary: (count: Int, totalBytesReceived: Int64)? {
+        let uploads = activeTransfers.values.filter {
+            $0.direction == .upload && ($0.status == .inProgress || $0.status == .completed)
+        }
+        guard !uploads.isEmpty else { return nil }
+        return (uploads.count, uploads.reduce(0) { $0 + $1.transferredBytes })
+    }
+
+    /// Transferencias agrupadas por dirección, para los paneles separados de
+    /// Descargas y Subidas — feedback del usuario (2026-09-07): "para carga
+    /// una ventana y para descarga otra". `nil` = todavía "Detecting…"
+    /// (normalmente dura una fracción de segundo).
+    var downloadTransfers: [TransferProgress] {
+        activeTransfers.values.filter { $0.direction == .download }.sorted { $0.startDate < $1.startDate }
+    }
+
+    var uploadTransfers: [TransferProgress] {
+        activeTransfers.values.filter { $0.direction == .upload }.sorted { $0.startDate < $1.startDate }
+    }
+
+    var detectingTransfers: [TransferProgress] {
+        activeTransfers.values.filter { $0.direction == nil }.sorted { $0.startDate < $1.startDate }
+    }
+
+    /// Un solo botón por panel para descartar todas las transferencias ya
+    /// terminadas de esa dirección (completadas/canceladas/fallidas) de una
+    /// vez, en vez de un "Done" por tarjeta — feedback del usuario
+    /// (2026-09-07). `direction: nil` cubre las que nunca llegaron a
+    /// resolverse (caso raro).
+    func dismissAllFinishedTransfers(direction: TransferDirection?) {
+        for (pid, transfer) in activeTransfers where transfer.direction == direction && transfer.status != .inProgress {
+            dismissTransfer(pid: pid)
+        }
     }
 
     func refreshAll() async {
@@ -90,6 +159,30 @@ final class AppState: ObservableObject {
         parentFolderPermissionsOK = fileSystemService.hasAppropriatePermissions(parent)
     }
 
+    /// Botón "Fix" junto a "Working path permissions" — feedback del usuario
+    /// (2026-09-07): "esto siempre me ha aparecido OK, pero debe quedar que
+    /// cuando no, haya un botón que solucione eso, igual que el Start del
+    /// server". Solo agrega el bit de lectura/ejecución faltante para el
+    /// dueño; no requiere autorización porque la app corre como el usuario
+    /// actual y solo toca carpetas que ya le pertenecen.
+    func repairWorkingPathPermissions() {
+        guard fileSystemService.repairPermissions(configuration.rootDirectory) else {
+            lastError = .permissionsRepairFailed
+            return
+        }
+        refreshPermissions()
+    }
+
+    /// Mismo botón, para "Parent folder permissions".
+    func repairParentFolderPermissions() {
+        let parent = configuration.rootDirectory.deletingLastPathComponent()
+        guard fileSystemService.repairPermissions(parent) else {
+            lastError = .permissionsRepairFailed
+            return
+        }
+        refreshPermissions()
+    }
+
     func changeRootDirectory(to url: URL) {
         guard PathValidator.isValidRoot(url) else {
             lastError = .rootDirectoryInvalid
@@ -110,6 +203,13 @@ final class AppState: ObservableObject {
 
     func start() async {
         do {
+            // `AppState.configuration` (root elegido con "Change Path", flags
+            // de Settings) vive solo aquí — el actor `NativeTFTPService`
+            // tiene su propia copia interna que nunca se actualizaba (bug
+            // real encontrado 2026-09-07 al probar "Allow uploads": el
+            // toggle no tenía ningún efecto porque nunca llegaba al servicio,
+            // que seguía generando el plist con su config por defecto).
+            try await serviceController.updateConfiguration(configuration)
             try await serviceController.start()
             log(.application, "Server started")
             logStreamMonitor.start { [weak self] line in
@@ -126,7 +226,8 @@ final class AppState: ObservableObject {
 
     func stop() async {
         logStreamMonitor.stop()
-        transferTrackingTask?.cancel()
+        trackingTasks.values.forEach { $0.cancel() }
+        trackingTasks.removeAll()
         do {
             try await serviceController.stop()
             log(.application, "Server stopped")
@@ -139,42 +240,20 @@ final class AppState: ObservableObject {
         await refreshStatus()
     }
 
-    func cancelActiveTransfer() async {
-        guard activeTransfer != nil else { return }
-        transferTrackingTask?.cancel()
-        await ProcessKiller.killTftpdChild()
-        activeTransfer?.status = .cancelled
-        activeTransfer?.endDate = Date()
-        archiveActiveTransfer()
+    func cancelTransfer(pid: Int32) async {
+        guard activeTransfers[pid] != nil else { return }
+        trackingTasks[pid]?.cancel()
+        await ProcessKiller.kill(pid: pid)
+        activeTransfers[pid]?.status = .cancelled
+        activeTransfers[pid]?.endDate = Date()
+        archiveTransfer(pid: pid)
     }
 
-    func dismissActiveTransfer() {
-        activeTransfer = nil
-    }
-
-    /// Toma un snapshot de los archivos actualmente en la carpeta TFTP y los
-    /// fija como el lote a trackear (ver PROJECT.md sección 49.2). No cambia
-    /// nada del comportamiento real del servidor — es puramente un contador
-    /// visual de qué tanto de ese lote ya fue efectivamente pedido por algún
-    /// dispositivo.
-    func startQueueSession() {
-        guard serverStatus == .running else {
-            lastError = .serverNotRunning
-            return
-        }
-        refreshFiles()
-        let filenames = files.map(\.name)
-        guard let session = QueueSession(filenames: filenames) else {
-            lastError = .emptyQueueFolder
-            return
-        }
-        lastError = nil
-        queueSession = session
-        log(.application, "Queue started: \(filenames.count) file(s) in \(session.totalBatches) batch(es)")
-    }
-
-    func stopQueueSession() {
-        queueSession = nil
+    func dismissTransfer(pid: Int32) {
+        activeTransfers[pid] = nil
+        trackingTasks[pid] = nil
+        lastSpeedSamples[pid] = nil
+        lastByteCounts[pid] = nil
     }
 
     private func ensureRootDirectoryExists() {
@@ -190,12 +269,14 @@ final class AppState: ObservableObject {
 
     private func handleActivityLine(_ line: String) {
         log(.system, line)
-        guard case .filenameDetected(let filename) = TransferActivityParser.parse(line: line) else { return }
+        guard case .filenameDetected(let pid, let filename) = TransferActivityParser.parse(line: line) else { return }
+        guard activeTransfers[pid] == nil else { return }
 
         let fileURL = configuration.rootDirectory.appendingPathComponent(filename)
         let knownDownloadSize = fileSystemService.fileSize(at: fileURL)
 
-        activeTransfer = TransferProgress(
+        activeTransfers[pid] = TransferProgress(
+            pid: pid,
             filename: filename,
             startDate: Date(),
             endDate: nil,
@@ -205,36 +286,37 @@ final class AppState: ObservableObject {
             speedBytesPerSecond: nil,
             status: .inProgress
         )
-        lastSpeedSample = nil
 
-        trackActiveTransfer(knownDownloadSize: knownDownloadSize)
+        trackTransfer(pid: pid, knownDownloadSize: knownDownloadSize)
     }
 
     /// Fuente única de verdad para una transferencia activa: progreso real,
     /// dirección y fin, todo leído de `nettop` (bytes reales enviados/
-    /// recibidos por el proceso `tftpd`, sin sudo porque corre como el
+    /// recibidos por ESE proceso específico, sin sudo porque corre como el
     /// usuario actual). `tftpd` no expone esto por log ni API — verificado en
     /// vivo (2026-09-05). RRQ (descarga) = tftpd envía datos → `bytesOut`
-    /// grande; WRQ (subida) = tftpd recibe datos → `bytesIn` grande.
-    private func trackActiveTransfer(knownDownloadSize: Int64?) {
-        transferTrackingTask?.cancel()
-        transferTrackingTask = Task { [weak self] in
+    /// grande; WRQ (subida) = tftpd recibe datos → `bytesIn` grande. Una
+    /// tarea independiente por PID permite trackear transferencias
+    /// simultáneas de verdad (confirmado en vivo, 2026-09-07: dos `tftpd`
+    /// corriendo a la vez sirviendo archivos distintos).
+    private func trackTransfer(pid: Int32, knownDownloadSize: Int64?) {
+        trackingTasks[pid]?.cancel()
+        trackingTasks[pid] = Task { [weak self] in
             while !Task.isCancelled {
                 guard let self else { return }
-                guard let pid = await NetworkByteMonitor.currentPID() else {
-                    self.finalizeActiveTransfer()
+                guard let counts = await NetworkByteMonitor.byteCounts(forPID: pid) else {
+                    self.finalizeTransfer(pid: pid)
                     return
                 }
-                if let counts = await NetworkByteMonitor.byteCounts(forPID: pid) {
-                    self.updateActiveTransfer(counts: counts, knownDownloadSize: knownDownloadSize)
-                }
+                self.updateTransfer(pid: pid, counts: counts, knownDownloadSize: knownDownloadSize)
                 try? await Task.sleep(nanoseconds: 150_000_000)
             }
         }
     }
 
-    private func updateActiveTransfer(counts: NetworkByteMonitor.ByteCounts, knownDownloadSize: Int64?) {
-        guard var transfer = activeTransfer, transfer.status == .inProgress else { return }
+    private func updateTransfer(pid: Int32, counts: NetworkByteMonitor.ByteCounts, knownDownloadSize: Int64?) {
+        lastByteCounts[pid] = counts
+        guard var transfer = activeTransfers[pid], transfer.status == .inProgress else { return }
 
         if transfer.direction == nil {
             if counts.bytesOut > 4096, counts.bytesOut > counts.bytesIn * 2 {
@@ -250,36 +332,69 @@ final class AppState: ObservableObject {
             transfer.totalBytes = knownDownloadSize
         case .upload:
             transfer.transferredBytes = counts.bytesIn
+            // `totalBytes` was seeded at creation with the TARGET file's
+            // pre-existing size (only meaningful for downloads) before the
+            // direction was known — must be cleared here, or an upload to a
+            // non-empty existing file shows a fabricated, meaningless
+            // percentage against the OLD content's size instead of no
+            // percentage at all. Bug found in vivo, 2026-09-07: an upload
+            // legitimately showed "100%" purely by size coincidence with a
+            // leftover target file from a prior test run.
+            transfer.totalBytes = nil
         case nil:
             break
         }
 
         let now = Date()
-        if let last = lastSpeedSample {
+        if let last = lastSpeedSamples[pid] {
             let elapsed = now.timeIntervalSince(last.date)
             if elapsed > 0 {
                 let deltaBytes = transfer.transferredBytes - last.bytes
                 transfer.speedBytesPerSecond = Double(deltaBytes) / elapsed
             }
         }
-        lastSpeedSample = (transfer.transferredBytes, now)
+        lastSpeedSamples[pid] = (transfer.transferredBytes, now)
 
-        activeTransfer = transfer
+        activeTransfers[pid] = transfer
     }
 
     /// El proceso `tftpd` de esta sesión (socket-activated, uno por
     /// transferencia) desapareció — es la única señal de "terminó" que
     /// tenemos.
-    private func finalizeActiveTransfer() {
-        guard var transfer = activeTransfer, transfer.status == .inProgress else { return }
+    ///
+    /// Transferencias por localhost pueden terminar en menos de un ciclo de
+    /// sondeo (150ms) sin que `updateTransfer` haya visto nunca un conteo que
+    /// cruzara el umbral de dirección — quedarían atrapadas para siempre en
+    /// el panel "Detecting" (bug real encontrado en vivo, 2026-09-07, con 3
+    /// subidas de ~1GB terminando en <1s). Si eso pasa, se resuelve aquí con
+    /// el último conteo conocido, sin exigir el margen de 2x — al terminar el
+    /// proceso, cualquier byte movido ya identifica la dirección real.
+    private func finalizeTransfer(pid: Int32) {
+        guard var transfer = activeTransfers[pid], transfer.status == .inProgress else { return }
+
+        if transfer.direction == nil, let counts = lastByteCounts[pid], counts.bytesOut != counts.bytesIn {
+            if counts.bytesOut > counts.bytesIn {
+                transfer.direction = .download
+                transfer.transferredBytes = counts.bytesOut
+            } else {
+                transfer.direction = .upload
+                transfer.transferredBytes = counts.bytesIn
+                transfer.totalBytes = nil // ver nota en `updateTransfer`
+            }
+        }
+
         transfer.status = .completed
         transfer.endDate = Date()
-        activeTransfer = transfer
-        archiveActiveTransfer()
+        if transfer.direction == .download, let total = transfer.totalBytes {
+            transfer.transferredBytes = total
+        }
+        activeTransfers[pid] = transfer
+        lastByteCounts[pid] = nil
+        archiveTransfer(pid: pid)
     }
 
-    private func archiveActiveTransfer() {
-        guard let transfer = activeTransfer else { return }
+    private func archiveTransfer(pid: Int32) {
+        guard let transfer = activeTransfers[pid] else { return }
         let record = TFTPTransfer(
             date: transfer.startDate,
             clientAddress: nil,
@@ -290,9 +405,5 @@ final class AppState: ObservableObject {
             duration: transfer.elapsedSeconds
         )
         transfers.insert(record, at: 0)
-
-        if transfer.status == .completed {
-            queueSession?.markCompleted(filename: transfer.filename)
-        }
     }
 }

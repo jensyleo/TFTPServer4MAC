@@ -70,20 +70,6 @@ struct DashboardView: View {
                     Label("Refresh", systemImage: "arrow.clockwise")
                         .labelStyle(.titleAndIcon)
                 }
-
-                Button {
-                    if appState.queueSession != nil {
-                        appState.stopQueueSession()
-                    } else {
-                        appState.startQueueSession()
-                    }
-                } label: {
-                    Label(
-                        appState.queueSession != nil ? "Stop Queue" : "Start Queue",
-                        systemImage: "tray.full"
-                    )
-                    .labelStyle(.titleAndIcon)
-                }
             }
         }
         .alert("New File", isPresented: $isShowingCreateFileAlert) {
@@ -106,8 +92,14 @@ struct DashboardView: View {
             await appState.checkForOrphanedServerAtLaunch()
             await appState.refreshAll()
         }
-        .sheet(item: $appState.activeTransfer) { transfer in
-            TransferProgressSheet(transfer: transfer)
+        .overlay(alignment: .bottomTrailing) {
+            DirectionalTransfersPanel(direction: .download, transfers: appState.downloadTransfers)
+        }
+        .overlay(alignment: .bottomLeading) {
+            DirectionalTransfersPanel(direction: .upload, transfers: appState.uploadTransfers)
+        }
+        .overlay(alignment: .top) {
+            DetectingTransfersPanel(transfers: appState.detectingTransfers)
         }
         .sheet(isPresented: $appState.isBlockedByOrphanedServer) {
             OrphanedServerBlockingView()

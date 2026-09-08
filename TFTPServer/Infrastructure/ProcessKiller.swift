@@ -11,11 +11,14 @@ import Foundation
 /// que matarlo no requiere autorización. Cancelar una transferencia debe
 /// sentirse instantáneo, no pedir contraseña de nuevo (feedback del usuario,
 /// 2026-09-04).
+///
+/// Mata un PID específico, no todos los `tftpd` (2026-09-07): con
+/// transferencias simultáneas reales, cancelar una no debe tocar las demás.
 enum ProcessKiller {
-    static func killTftpdChild() async {
+    static func kill(pid: Int32) async {
         _ = try? await ProcessRunner().run(
-            executable: URL(fileURLWithPath: "/usr/bin/pkill"),
-            arguments: ["-f", "/usr/libexec/tftpd"]
+            executable: URL(fileURLWithPath: "/bin/kill"),
+            arguments: [String(pid)]
         )
     }
 }

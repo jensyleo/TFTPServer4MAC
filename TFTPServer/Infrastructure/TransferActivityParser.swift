@@ -7,7 +7,7 @@
 import Foundation
 
 enum TransferEvent {
-    case filenameDetected(String)
+    case filenameDetected(pid: Int32, filename: String)
 }
 
 /// Interpreta las líneas de debug del `tftpd` real (activado con `-l -d15`,
@@ -22,11 +22,17 @@ enum TransferEvent {
 /// usar una ruta de impresión que no pasa por syslog cuando corre sin tty).
 /// Por eso el parser solo puede exponer "se detectó un archivo", y
 /// `AppState` infiere la dirección observando si el archivo crece en disco.
+///
+/// El log en formato `--style compact` sí incluye el PID del proceso
+/// (`tftpd[PID:TID] Filename: 'x'`) — verificado en vivo con dos
+/// transferencias simultáneas (2026-09-07). Se usa ese PID, no `pgrep`, para
+/// distinguir transferencias concurrentes correctamente: `pgrep -f` no puede
+/// diferenciar cuál de varios procesos `tftpd` corresponde a cuál archivo.
 enum TransferActivityParser {
-    nonisolated(unsafe) private static let filenamePattern = /Filename: '(.+)'/
+    nonisolated(unsafe) private static let filenamePattern = /tftpd\[(\d+):[^\]]*\].*Filename: '(.+)'/
 
     static func parse(line: String) -> TransferEvent? {
-        guard let match = line.firstMatch(of: filenamePattern) else { return nil }
-        return .filenameDetected(String(match.1))
+        guard let match = line.firstMatch(of: filenamePattern), let pid = Int32(match.1) else { return nil }
+        return .filenameDetected(pid: pid, filename: String(match.2))
     }
 }

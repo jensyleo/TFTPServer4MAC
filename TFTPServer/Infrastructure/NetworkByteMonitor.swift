@@ -45,17 +45,4 @@ enum NetworkByteMonitor {
         guard fields.count >= 2 else { return nil }
         return ByteCounts(bytesIn: fields[fields.count - 2], bytesOut: fields[fields.count - 1])
     }
-
-    static func currentPID() async -> Int32? {
-        guard let output = try? await ProcessRunner().run(
-            executable: URL(fileURLWithPath: "/usr/bin/pgrep"),
-            arguments: ["-f", "/usr/libexec/tftpd"]
-        ) else {
-            return nil
-        }
-        let firstLine = output.standardOutput
-            .split(separator: "\n")
-            .first.map(String.init) ?? ""
-        return Int32(firstLine.trimmingCharacters(in: .whitespaces))
-    }
 }

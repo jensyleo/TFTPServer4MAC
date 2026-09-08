@@ -7,7 +7,12 @@
 import Foundation
 
 struct TransferProgress: Equatable, Identifiable {
-    var id: String { filename }
+    /// El PID del proceso `tftpd` de esta transferencia, no el nombre de
+    /// archivo — con transferencias simultáneas reales (2026-09-07), dos
+    /// clientes distintos podrían, en teoría, pedir el mismo archivo a la
+    /// vez, y cada uno es un proceso y una identidad distintos.
+    var id: Int32 { pid }
+    let pid: Int32
 
     enum Status: Equatable {
         case inProgress
