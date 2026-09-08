@@ -18,7 +18,7 @@ struct DashboardView: View {
             pathAndInterfaceBar
 
             Picker("", selection: $selectedTab) {
-                Text("Current Path").tag(0)
+                Text("Files").tag(0)
                 Text("Transfers").tag(1)
                 Text("Log Viewer").tag(2)
             }
@@ -122,26 +122,30 @@ struct DashboardView: View {
 
     private var pathAndInterfaceBar: some View {
         HStack {
-            Text("Path:")
-                .foregroundStyle(.secondary)
-            Text(appState.configuration.rootDirectory.path)
-                .lineLimit(1)
-                .truncationMode(.middle)
-                .padding(.vertical, 6)
-                .padding(.horizontal, 10)
-                .background(.quaternary, in: RoundedRectangle(cornerRadius: 6))
+            HStack(spacing: 4) {
+                Text("Path:")
+                    .foregroundStyle(.secondary)
+                Text(appState.configuration.rootDirectory.path)
+                    .lineLimit(1)
+                    .truncationMode(.middle)
+                    .padding(.vertical, 6)
+                    .padding(.horizontal, 10)
+                    .background(.quaternary, in: RoundedRectangle(cornerRadius: 6))
+            }
 
             Spacer()
 
-            Text("Interface:")
-                .foregroundStyle(.secondary)
-            Picker("", selection: $appState.selectedInterfaceID) {
-                ForEach(appState.networkInterfaces) { interface in
-                    Text("\(interface.displayName): \(interface.ipv4Address ?? "—")")
-                        .tag(Optional(interface.id))
+            HStack(spacing: 4) {
+                Text("Interface:")
+                    .foregroundStyle(.secondary)
+                Picker("", selection: $appState.selectedInterfaceID) {
+                    ForEach(appState.networkInterfaces) { interface in
+                        Text("\(interface.displayName): \(interface.ipv4Address ?? "—")")
+                            .tag(Optional(interface.id))
+                    }
                 }
+                .frame(maxWidth: 260)
             }
-            .frame(maxWidth: 260)
         }
         .padding(.horizontal)
         .padding(.top, 12)
