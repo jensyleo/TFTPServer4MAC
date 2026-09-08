@@ -47,6 +47,14 @@ struct DashboardView: View {
                     Label("Change Path", systemImage: "folder.badge.gearshape")
                         .labelStyle(.titleAndIcon)
                 }
+                // Pedido por el usuario (2026-09-08), por unificación con la
+                // versión Intel: no permitir cambiar la carpeta mientras el
+                // servidor está corriendo — cambiarla ahí no aplicaba de
+                // inmediato de todos modos (requiere Stop/Start), así que
+                // dejar el botón activo solo invitaba a confundirse pensando
+                // que sí surtía efecto en caliente.
+                .disabled(appState.serverStatus == .running)
+                .help(appState.serverStatus == .running ? "Stop the server to change the TFTP folder." : "")
 
                 Button {
                     NSWorkspace.shared.selectFile(nil, inFileViewerRootedAtPath: appState.configuration.rootDirectory.path)
