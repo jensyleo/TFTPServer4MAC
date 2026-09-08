@@ -59,6 +59,9 @@ enum HelpLibrary {
             HelpSection(paragraphs: [
                 "1. Choose a TFTP folder (\"Change Path\"). 2. Copy the file a device needs into that folder. 3. Press Start and authorize once. 4. Configure the device with this Mac's IP (shown next to the network interface picker). 5. Press Stop when done.",
             ]),
+            HelpSection(heading: "The bottom status bar", paragraphs: [
+                "Shows three columns: Server status (with the Start/Stop button), Working path permissions, and Parent folder permissions. If either permissions column ever shows \"Fix needed\", a \"Fix\" button appears right there — it adds the missing read/traverse permission for your own user account, without needing any password (this app only ever touches folders you already own).",
+            ]),
             HelpSection(heading: "Toolbar", rows: [
                 .init(term: "Start / Stop TFTP", detail: "Loads or unloads the TFTP daemon. Both require a one-time macOS administrator authorization dialog — see \"Why the password prompts\"."),
                 .init(term: "Change Path", detail: "Picks the folder the server reads from and writes to."),
@@ -68,9 +71,17 @@ enum HelpLibrary {
             ]),
         ]),
         HelpTopic(id: "transfers", title: "Transfers & progress", symbol: "arrow.up.arrow.down.circle", sections: [
-            HelpSection(heading: "The progress window", paragraphs: [
-                "Appears automatically the moment a device requests a file. Shows a real percentage (not simulated) for downloads, since the file's total size is already known from disk; for uploads it shows bytes received so far, since the total size isn't reliably knowable in advance.",
+            HelpSection(heading: "The progress panel", paragraphs: [
+                "Appears automatically the moment a device requests a file, as a floating panel — not a window that blocks the rest of the app. Shows a real percentage (not simulated) for downloads, since the file's total size is already known from disk; for uploads it shows bytes received so far, since the total size isn't reliably knowable in advance.",
                 "Also shows live transfer speed, an estimated time remaining (downloads only), and an elapsed-time counter that becomes a final duration once the transfer ends.",
+            ]),
+            HelpSection(heading: "Multiple simultaneous transfers", paragraphs: [
+                "The native `tftpd` genuinely serves more than one device at a time — this isn't simulated. Each active transfer gets its own card, with its own progress, speed, and Cancel button, independent of the others.",
+            ]),
+            HelpSection(heading: "Two separate panels: Downloads and Uploads", paragraphs: [
+                "Downloads and uploads appear in two independent floating panels (bottom-right and bottom-left) so it's immediately clear which devices are pulling files and which are pushing them. A brand-new transfer briefly shows in a small \"Detecting…\" panel (top-right) until its direction is determined — usually a fraction of a second — then moves into the matching panel.",
+                "Each panel has its own combined progress and its own \"Done\" button. Starting a new transfer never affects the other panel, and never hides or dismisses cards that already finished — a finished card with its \"Done\" button still showing stays exactly as it is even if a new transfer starts (in the same panel or the other one) before you click it. There is no \"server busy\" state: every transfer is tracked independently by its own process, from the moment it's detected until it ends.",
+                "When two or more downloads are running at once, the Downloads panel shows a combined progress bar above the individual cards, summing bytes transferred against total bytes across every download with a known size. Uploads have no reliable total to sum (see below), so the Uploads panel instead shows a running count and total bytes received.",
             ]),
             HelpSection(heading: "Cancel", rows: [
                 .init(term: "Cancel", detail: "Stops the in-progress transfer immediately. Does not require re-entering a password — the transfer process runs as your own user, not as root."),
@@ -82,24 +93,15 @@ enum HelpLibrary {
                 "The requesting device's IP address isn't shown: reading it would require another administrator authorization just for that one detail, which isn't worth the friction. Whether the transfer is a firmware read or a config write is detected automatically a fraction of a second after it starts — briefly shown as \"Detecting…\".",
             ]),
         ]),
-        HelpTopic(id: "queue", title: "Queue progress", symbol: "tray.full", sections: [
-            HelpSection(paragraphs: [
-                "\"Start Queue\" takes a snapshot of every file currently in the TFTP folder and tracks which of them have been requested at least once, in batches of 10 for readability — there is no limit on how many files a folder can hold.",
-            ]),
-            HelpSection(heading: "How progress is measured", paragraphs: [
-                "Each completed transfer whose filename matches the original snapshot counts toward the current batch. A file added to the folder after starting the queue doesn't count — the queue is a fixed snapshot, not something that recalculates itself as the folder changes.",
-            ]),
-            HelpSection(heading: "This is not a real request queue", paragraphs: [
-                "This app is a passive server: it never chooses which file a device asks for, or in what order. This feature only counts what actually happens — it cannot force a connected device to request every file in the batch, or in any particular sequence. If a device never asks for one of the files, that batch simply stays incomplete until you press \"Stop Queue\".",
-            ]),
-        ]),
         HelpTopic(id: "security-permissions", title: "Security & permissions", symbol: "lock.shield", sections: [
             HelpSection(heading: "Why Start/Stop ask for a password", paragraphs: [
                 "Listening on TFTP's standard port (UDP 69) requires macOS administrator privileges — that's an operating-system rule, not a choice made by this app. The app never uses Terminal `sudo`; it uses macOS's own native authorization dialog (Touch ID or your password), once per Start and once per Stop.",
                 "Nothing is left behind: Stop removes every trace of the temporary service registration. If the app is force-quit or crashes while the server is running, the next launch detects this and requires you to authorize stopping it before the app can be used — see \"Orphaned server on launch\".",
             ]),
             HelpSection(heading: "Uploads — a real limitation of the native daemon", paragraphs: [
-                "\"Allow uploads\" controls whether the server can create brand-new files at all. But even with uploads disabled, macOS's `tftpd` will still allow a device to overwrite a file that already exists in the TFTP folder, if that file's own permissions make it writable by everyone. This is a limitation of the underlying Apple daemon, not something this app can fully override — the safest setup is to keep files in the TFTP folder read-only unless you specifically intend them to be overwritten.",
+                "This app has no setting to enable uploads — there used to be one (\"Allow uploads\", passing `-w` to `tftpd`), but it was removed (2026-09-07) after testing showed `-w` doesn't reliably enable creating brand-new files in the per-user mode this app deliberately uses (see \"Why Start/Stop ask for a password\"). Apple's own manual page for `-w` notes it \"only works in directories writable by the user specified with -u option\", which points at the `-s`/`-u` chroot mode instead — a materially different, not-yet-investigated architecture.",
+                "The one reliable way to receive an upload, with no setting needed: the target file must already exist in the TFTP folder and be writable by everyone. Use \"Create File\" to prepare an empty placeholder first, then let the device overwrite it.",
+                "This also means `tftpd` will overwrite any file that already exists in the TFTP folder if that file's own permissions make it writable by everyone, whether or not you intended it as an upload target — this app can't override that. The safest setup is to keep files in the TFTP folder read-only unless you specifically intend them to be overwritten.",
             ]),
             HelpSection(heading: "No overwrite detection or confirmation", paragraphs: [
                 "TFTP itself has no concept of confirming a write. When a device sends a file to a name that already exists (and is writable), `tftpd` overwrites it immediately — no warning, no \"are you sure?\", no backup of the previous content. This app cannot intervene: by the time it can tell a transfer is an upload (by watching bytes actually being written), the overwrite has already started or finished. The only real protection is prevention, not detection: keep \"Allow uploads\" off, and keep files in the TFTP folder read-only unless you specifically intend them to be replaceable.",
@@ -128,7 +130,6 @@ enum HelpLibrary {
         ]),
         HelpTopic(id: "limitations", title: "Known limitations", symbol: "exclamationmark.triangle", sections: [
             HelpSection(rows: [
-                .init(term: "One transfer tracked at a time", detail: "The underlying daemon can actually serve multiple devices at once, but this app's progress window and history currently track only one transfer at a time. A request queue (accepting several requests but always processing one at a time) is planned but not yet built."),
                 .init(term: "No control over client-negotiated options", detail: "Block size, timeout, and retry count are chosen by the requesting device, not configurable from this app — the native daemon accepts what the client asks for."),
                 .init(term: "No per-IP allow/deny list", detail: "macOS's `tftpd` has no such feature; enforcing this would require separate firewall rules, which this app does not manage."),
             ]),
