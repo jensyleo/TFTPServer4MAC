@@ -21,6 +21,7 @@
 		5220A23BE33B760F4B18EDE1 /* HelpView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 954ACEAA702EF3D4EA8D0BE9 /* HelpView.swift */; };
 		52803F0789E0B806AC1E390B /* ProcessKiller.swift in Sources */ = {isa = PBXBuildFile; fileRef = 70B989F7BA32149AA3EA3776 /* ProcessKiller.swift */; };
 		539038731AD5CD8A98B00348 /* LogStreamMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = C96261C42F370C392FC123E3 /* LogStreamMonitor.swift */; };
+		55B0B1E117FE8FAAAA39BCE3 /* AppStateStartGateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C6A7658E15C957F34DB4123 /* AppStateStartGateTests.swift */; };
 		5CD4033AABBA54E708FBD3F4 /* TFTPServiceManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAC37DC530FE6C9A1EAE985B /* TFTPServiceManagerTests.swift */; };
 		6ED503619E0AED9D9007FD0C /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 783881C1CB286CD1D2871239 /* AppState.swift */; };
 		76F835D5E0BD56D6EBD52351 /* TFTPServiceControlling.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09973E3318EA41ECE42C1ACB /* TFTPServiceControlling.swift */; };
@@ -70,6 +71,7 @@
 		463B279DEBBD1707AA2A6052 /* LogViewerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogViewerView.swift; sourceTree = "<group>"; };
 		483FAAFA556BDC3132CA069B /* TFTPServiceError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TFTPServiceError.swift; sourceTree = "<group>"; };
 		57B57B1C5DCD33400FF8D8A6 /* LaunchdManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchdManager.swift; sourceTree = "<group>"; };
+		5C6A7658E15C957F34DB4123 /* AppStateStartGateTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppStateStartGateTests.swift; sourceTree = "<group>"; };
 		5D764A5401DB27CFE1BF1E45 /* HelpTopic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelpTopic.swift; sourceTree = "<group>"; };
 		61A05B78422CCF87BB43C3EF /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		678F7F9BD55B421159D51249 /* TFTPTransfer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TFTPTransfer.swift; sourceTree = "<group>"; };
@@ -209,6 +211,7 @@
 		E25BE53499075475352B50DD /* TFTPServerTests */ = {
 			isa = PBXGroup;
 			children = (
+				5C6A7658E15C957F34DB4123 /* AppStateStartGateTests.swift */,
 				6D4E02763D6A8BC46BAFE66A /* FileSystemServiceTests.swift */,
 				7D8E3D11CD47B31ABD5E1FA4 /* PathValidatorTests.swift */,
 				976EBD5BE7CC32BBBF326876 /* SystemDetectorTests.swift */,
@@ -313,6 +316,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				55B0B1E117FE8FAAAA39BCE3 /* AppStateStartGateTests.swift in Sources */,
 				B6E8233E3DE2F1A42E25BDAF /* FileSystemServiceTests.swift in Sources */,
 				411B2D7FF701F0BE0DB436D8 /* PathValidatorTests.swift in Sources */,
 				895FAB784A5D7208EB533C53 /* SystemDetectorTests.swift in Sources */,

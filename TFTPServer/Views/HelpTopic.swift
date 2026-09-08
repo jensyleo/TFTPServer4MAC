@@ -64,7 +64,7 @@ enum HelpLibrary {
             ]),
             HelpSection(heading: "Toolbar", rows: [
                 .init(term: "Start / Stop TFTP", detail: "Loads or unloads the TFTP daemon. Both require a one-time macOS administrator authorization dialog — see \"Why the password prompts\"."),
-                .init(term: "Change Path", detail: "Picks the folder the server reads from and writes to."),
+                .init(term: "Change Path", detail: "Picks the folder the server reads from and writes to. Rejects the entire disk (\"/\"), top-level folders like /Users or /Applications, system folders, and paths containing \"..\" — a TFTP root must be a real folder of your own, at least two levels deep, so a misconfigured server can never expose more than one specific folder."),
                 .init(term: "Reveal", detail: "Opens the current TFTP folder in Finder."),
                 .init(term: "Create File", detail: "Creates an empty placeholder file in the TFTP folder — useful for preparing an upload target, since by default `tftpd` can only overwrite a file that already exists."),
                 .init(term: "Refresh", detail: "Re-reads the file list and permission checks without restarting the server."),
