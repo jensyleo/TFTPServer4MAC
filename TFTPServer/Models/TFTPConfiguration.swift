@@ -8,23 +8,11 @@ import Foundation
 
 struct TFTPConfiguration: Equatable, Sendable {
     var rootDirectory: URL
-    var allowDownloads: Bool
-    var allowUploads: Bool
-    var allowCreateFiles: Bool
-    var startAtLogin: Bool
-    var loggingEnabled: Bool
 
     static var conservativeDefault: TFTPConfiguration {
         let defaultRoot = FileManager.default
             .homeDirectoryForCurrentUser
             .appendingPathComponent("TFTP", isDirectory: true)
-        return TFTPConfiguration(
-            rootDirectory: defaultRoot,
-            allowDownloads: true,
-            allowUploads: false,
-            allowCreateFiles: false,
-            startAtLogin: false,
-            loggingEnabled: true
-        )
+        return TFTPConfiguration(rootDirectory: defaultRoot)
     }
 }
