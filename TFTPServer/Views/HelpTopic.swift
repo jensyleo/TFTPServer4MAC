@@ -76,7 +76,8 @@ enum HelpLibrary {
                 "Also shows live transfer speed, an estimated time remaining (downloads only), and an elapsed-time counter that becomes a final duration once the transfer ends.",
             ]),
             HelpSection(heading: "Multiple simultaneous transfers", paragraphs: [
-                "The native `tftpd` genuinely serves more than one device at a time — this isn't simulated. Each active transfer gets its own card, with its own progress, speed, and Cancel button, independent of the others.",
+                "The native `tftpd` genuinely serves more than one device at a time — this isn't simulated. Each active transfer gets its own card, with its own progress, speed, and Cancel button, independent of the others, even when two devices request the exact same file at the same time.",
+                "TFTP has no file-locking of its own: if two devices upload to the same filename at the same time, both transfers complete without any error, but only one ends up as the file's final content — whichever one finishes writing last. This is inherent to the protocol, not something this app or macOS's `tftpd` can prevent.",
             ]),
             HelpSection(heading: "Two separate panels: Downloads and Uploads", paragraphs: [
                 "Downloads and uploads appear in two independent floating panels (bottom-right and bottom-left) so it's immediately clear which devices are pulling files and which are pushing them. A brand-new transfer briefly shows in a small \"Detecting…\" panel (top-right) until its direction is determined — usually a fraction of a second — then moves into the matching panel.",
