@@ -44,7 +44,25 @@ import Foundation
 /// `launchctl load` igual que el de `tftpd`, es el mismo patrón ya probado
 /// en este proyecto y no depende de que el shell padre siga vivo.
 enum ClientIPCaptureService {
-    static let logPath = "/tmp/com.jensyleo.tftpserver.client_ips.log"
+    /// Vulnerabilidad real corregida (2026-09-08, auditoría de seguridad):
+    /// este archivo vivía en `/tmp` — un directorio compartido y escribible
+    /// por cualquier usuario local. Un atacante local podía plantar un
+    /// symlink en esta ruta exacta antes de que el comando elevado hiciera
+    /// `rm -f`/`touch`/`chmod`; el `chmod 644` (ejecutado como root) habría
+    /// terminado aplicándose al archivo que apuntara ese symlink —un
+    /// ataque clásico de "symlink race" en un directorio compartido. Se
+    /// mueve a una carpeta dentro del `home` del usuario actual, que otros
+    /// usuarios locales no pueden escribir (a diferencia de `/tmp`), así
+    /// que no pueden plantar nada ahí de antemano.
+    static let logPath: String = {
+        FileManager.default.homeDirectoryForCurrentUser
+            .appendingPathComponent("Library/Caches/com.jensyleo.tftpserver", isDirectory: true)
+            .appendingPathComponent("client_ips.log")
+            .path
+    }()
+    private static var logDirectory: String {
+        (logPath as NSString).deletingLastPathComponent
+    }
     static let label = "com.jensyleo.tftpserver.capture"
     static let plistPath = "/Library/LaunchDaemons/\(label).plist"
 
@@ -89,8 +107,11 @@ enum ClientIPCaptureService {
         let base64 = Data(plistContents().utf8).base64EncodedString()
         return """
         launchctl unload -w \(plistPath) 2>/dev/null
+        mkdir -p \(logDirectory)
+        chown \(NSUserName()) \(logDirectory)
         rm -f \(logPath)
         touch \(logPath)
+        chown \(NSUserName()) \(logPath)
         chmod 644 \(logPath)
         echo \(base64) | base64 -D -o \(plistPath)
         launchctl load -w \(plistPath)
