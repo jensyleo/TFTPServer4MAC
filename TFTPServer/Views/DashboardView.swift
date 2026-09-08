@@ -122,6 +122,8 @@ struct DashboardView: View {
 
     private var pathAndInterfaceBar: some View {
         HStack {
+            Text("Path:")
+                .foregroundStyle(.secondary)
             Text(appState.configuration.rootDirectory.path)
                 .lineLimit(1)
                 .truncationMode(.middle)
@@ -131,6 +133,8 @@ struct DashboardView: View {
 
             Spacer()
 
+            Text("Interface:")
+                .foregroundStyle(.secondary)
             Picker("", selection: $appState.selectedInterfaceID) {
                 ForEach(appState.networkInterfaces) { interface in
                     Text("\(interface.displayName): \(interface.ipv4Address ?? "—")")
