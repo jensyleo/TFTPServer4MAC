@@ -51,6 +51,14 @@ final class AppState: ObservableObject {
     /// `updateTransfer` alcanzara a verla cruzar el umbral normal (ver
     /// `finalizeTransfer`).
     private var lastByteCounts: [Int32: NetworkByteMonitor.ByteCounts] = [:]
+    /// Cuántas líneas del archivo de captura de IP (ver
+    /// `ClientIPCaptureService`) ya se emparejaron con una transferencia —
+    /// las líneas llegan aproximadamente en el mismo orden que las
+    /// detecciones de `handleActivityLine`, así que se consumen en fila
+    /// (FIFO), no por ningún identificador compartido (no existe uno: el
+    /// puerto 69 no dice nada sobre a qué PID terminará asignándose la
+    /// transferencia).
+    private var consumedClientIPLines = 0
 
     init(serviceController: TFTPServiceController = TFTPServiceController(service: NativeTFTPService())) {
         self.serviceController = serviceController
@@ -242,6 +250,7 @@ final class AppState: ObservableObject {
             try await serviceController.updateConfiguration(configuration)
             try await serviceController.start()
             log(.application, "Server started")
+            consumedClientIPLines = 0
             logStreamMonitor.start { [weak self] line in
                 self?.handleActivityLine(line)
             }
@@ -268,6 +277,18 @@ final class AppState: ObservableObject {
             lastError = .unknown
         }
         await refreshStatus()
+    }
+
+    /// Ícono de toggle pedido por el usuario (2026-09-08) para "Show client
+    /// IP". Si el servidor ya está corriendo, aplicar el cambio requiere
+    /// reiniciarlo — eso sí pide su propia autorización (inevitable, pero
+    /// solo en ese caso puntual; activarlo antes de Start no pide nada
+    /// aparte de la autorización normal de Start).
+    func toggleClientIPCapture() async {
+        configuration.isClientIPCaptureEnabled.toggle()
+        guard serverStatus == .running else { return }
+        await stop()
+        await start()
     }
 
     func cancelTransfer(pid: Int32) async {
@@ -314,10 +335,26 @@ final class AppState: ObservableObject {
             totalBytes: knownDownloadSize,
             transferredBytes: 0,
             speedBytesPerSecond: nil,
-            status: .inProgress
+            status: .inProgress,
+            clientIP: nextCapturedClientIP()
         )
 
         trackTransfer(pid: pid, knownDownloadSize: knownDownloadSize)
+    }
+
+    /// Empareja esta transferencia recién detectada con la siguiente línea
+    /// sin consumir del archivo de captura de IP (ver
+    /// `ClientIPCaptureService`) — no hay ningún identificador compartido
+    /// entre ambas fuentes, así que se asume orden de llegada (FIFO). `nil`
+    /// si la captura no está activa o todavía no hay una línea nueva que
+    /// corresponda (puede llegar unos milisegundos después que la detección
+    /// del nombre de archivo).
+    private func nextCapturedClientIP() -> String? {
+        guard configuration.isClientIPCaptureEnabled else { return nil }
+        let lines = ClientIPCaptureService.readCapturedLines()
+        guard consumedClientIPLines < lines.count else { return nil }
+        defer { consumedClientIPLines += 1 }
+        return ClientIPCaptureService.parseSourceIP(from: lines[consumedClientIPLines])
     }
 
     /// Fuente única de verdad para una transferencia activa: progreso real,
@@ -347,6 +384,15 @@ final class AppState: ObservableObject {
     private func updateTransfer(pid: Int32, counts: NetworkByteMonitor.ByteCounts, knownDownloadSize: Int64?) {
         lastByteCounts[pid] = counts
         guard var transfer = activeTransfers[pid], transfer.status == .inProgress else { return }
+
+        // La línea de captura de IP puede escribirse unos milisegundos
+        // después de que ya se detectó el nombre de archivo (buffering de
+        // `tcpdump`) — reintentar en los primeros ciclos de sondeo (cada
+        // 150ms) en vez de conformarse con el intento único al crear la
+        // transferencia.
+        if transfer.clientIP == nil, configuration.isClientIPCaptureEnabled {
+            transfer.clientIP = nextCapturedClientIP()
+        }
 
         if transfer.direction == nil {
             if counts.bytesOut > 4096, counts.bytesOut > counts.bytesIn * 2 {
@@ -427,7 +473,7 @@ final class AppState: ObservableObject {
         guard let transfer = activeTransfers[pid] else { return }
         let record = TFTPTransfer(
             date: transfer.startDate,
-            clientAddress: nil,
+            clientAddress: transfer.clientIP,
             filename: transfer.filename,
             direction: transfer.direction,
             size: transfer.totalBytes ?? transfer.transferredBytes,

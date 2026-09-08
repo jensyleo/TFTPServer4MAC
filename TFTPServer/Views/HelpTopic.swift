@@ -90,8 +90,14 @@ enum HelpLibrary {
             HelpSection(heading: "The \"Transfers\" tab", paragraphs: [
                 "A running history of every transfer this session: time, direction, filename, size, status (Completed/Cancelled), and duration. Cleared when the app quits — it is not saved to disk.",
             ]),
-            HelpSection(heading: "What isn't shown, and why", paragraphs: [
-                "The requesting device's IP address isn't shown: reading it would require another administrator authorization just for that one detail, which isn't worth the friction. Whether the transfer is a firmware read or a config write is detected automatically a fraction of a second after it starts — briefly shown as \"Detecting…\".",
+            HelpSection(heading: "Showing the client's IP address", paragraphs: [
+                "This requires capturing network traffic, which macOS restricts to administrator privileges — there's no other way to see it (`tftpd` never exposes it to any process-level tool). Turning this on *before* pressing Start applies it as part of Start's own one-time authorization, no extra prompt. Turning it on while the server is already running restarts the server to apply it, which does ask for authorization again.",
+                "The capture is deliberately narrow: it only watches the very first packet of each request (the one addressed to port 69), which is the only place the address is needed — the rest of the transfer moves to a different port this app never inspects. It stops the moment you turn this back off or press Stop.",
+            ], rows: [
+                .init(term: "Show Client IP (toolbar)", detail: "Off by default. When on, each transfer card shows \"From <IP address>\" — the real source address of the device that made the request, and the Transfers tab's history gets a Client IP column too."),
+            ]),
+            HelpSection(heading: "What else isn't shown, and why", paragraphs: [
+                "Whether the transfer is a firmware read or a config write is detected automatically a fraction of a second after it starts — briefly shown as \"Detecting…\".",
             ]),
         ]),
         HelpTopic(id: "security-permissions", title: "Security & permissions", symbol: "lock.shield", sections: [

@@ -70,6 +70,17 @@ struct DashboardView: View {
                     Label("Refresh", systemImage: "arrow.clockwise")
                         .labelStyle(.titleAndIcon)
                 }
+
+                Button {
+                    Task { await appState.toggleClientIPCapture() }
+                } label: {
+                    Label(
+                        "Show Client IP",
+                        systemImage: appState.configuration.isClientIPCaptureEnabled ? "eye.fill" : "eye.slash"
+                    )
+                    .labelStyle(.titleAndIcon)
+                }
+                .help("Capture the real source IP of each transfer request. Off by default — requires the same authorization as Start.")
             }
         }
         .alert("New File", isPresented: $isShowingCreateFileAlert) {

@@ -191,6 +191,12 @@ struct TransferCard: View {
                     .truncationMode(.middle)
             }
 
+            if let clientIP = transfer.clientIP {
+                Text("From \(clientIP)")
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+            }
+
             progressView
 
             timingView

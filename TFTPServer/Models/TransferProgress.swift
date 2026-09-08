@@ -41,6 +41,10 @@ struct TransferProgress: Equatable, Identifiable {
     /// consecutivas de `nettop`. `nil` hasta la segunda muestra.
     var speedBytesPerSecond: Double?
     var status: Status
+    /// La IP de origen real del datagrama inicial (RRQ/WRQ) — solo se
+    /// conoce si "Show client IP" está activo (ver `ClientIPCaptureService`);
+    /// `nil` en caso contrario o mientras aún no se correlaciona.
+    var clientIP: String?
 
     var fractionCompleted: Double? {
         guard let totalBytes, totalBytes > 0 else { return nil }

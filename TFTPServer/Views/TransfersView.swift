@@ -31,6 +31,10 @@ struct TransfersView: View {
                     Text(directionText(transfer.direction))
                 }
                 TableColumn("Filename", value: \.filename)
+                TableColumn("Client IP") { transfer in
+                    Text(transfer.clientAddress ?? "—")
+                        .foregroundStyle(transfer.clientAddress == nil ? .secondary : .primary)
+                }
                 TableColumn("Size") { transfer in
                     Text(transfer.size.map { ByteCountFormatter.string(fromByteCount: $0, countStyle: .file) } ?? "—")
                 }

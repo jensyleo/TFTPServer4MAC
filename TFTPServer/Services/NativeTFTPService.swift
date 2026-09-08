@@ -70,9 +70,17 @@ actor NativeTFTPService: TFTPServiceControlling {
         // importar el contenido del plist.
         let plistXML = Self.plistContents(root: currentConfiguration.rootDirectory)
         let plistBase64 = Data(plistXML.utf8).base64EncodedString()
+        // La captura de IP (si está activa) se arranca en esta MISMA
+        // elevación — una sola autorización cubre ambas cosas. Si el
+        // usuario la activa con el servidor ya corriendo, eso pasa por
+        // `restart()`/una nueva llamada a `start()`, que sí pediría su
+        // propia autorización — inevitable, pero solo en ese caso puntual.
+        let captureFragment = currentConfiguration.isClientIPCaptureEnabled
+            ? "\n" + ClientIPCaptureService.startCaptureShellFragment()
+            : ""
         let writeAndLoadCommand = """
         echo \(plistBase64) | base64 -D -o \(Self.ownPlistPath)
-        launchctl load -w \(Self.ownPlistPath)
+        launchctl load -w \(Self.ownPlistPath)\(captureFragment)
         """
 
         do {
@@ -91,9 +99,14 @@ actor NativeTFTPService: TFTPServiceControlling {
     }
 
     func stop() async throws {
+        // La limpieza de la captura de IP se intenta siempre, esté activa o
+        // no — es inofensiva si nunca se inició (el `if -f` de adentro no
+        // hace nada si el pidfile no existe) y evita depender de que
+        // `currentConfiguration` siga reflejando lo que de verdad se lanzó.
         let unloadCommand = """
         launchctl unload -w \(Self.ownPlistPath)
         rm -f \(Self.ownPlistPath)
+        \(ClientIPCaptureService.stopCaptureShellFragment())
         """
 
         do {

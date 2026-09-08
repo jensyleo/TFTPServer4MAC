@@ -20,9 +20,11 @@
 		4AFED5128E632C74FB204180 /* TransfersView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D482F8DA6079935F22106E00 /* TransfersView.swift */; };
 		5220A23BE33B760F4B18EDE1 /* HelpView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 954ACEAA702EF3D4EA8D0BE9 /* HelpView.swift */; };
 		52803F0789E0B806AC1E390B /* ProcessKiller.swift in Sources */ = {isa = PBXBuildFile; fileRef = 70B989F7BA32149AA3EA3776 /* ProcessKiller.swift */; };
+		52A6DD0470EC6E2F315E49A5 /* ClientIPCaptureService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A3F074F4E8F662B88F9F6422 /* ClientIPCaptureService.swift */; };
 		539038731AD5CD8A98B00348 /* LogStreamMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = C96261C42F370C392FC123E3 /* LogStreamMonitor.swift */; };
 		55B0B1E117FE8FAAAA39BCE3 /* AppStateStartGateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C6A7658E15C957F34DB4123 /* AppStateStartGateTests.swift */; };
 		5CD4033AABBA54E708FBD3F4 /* TFTPServiceManagerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAC37DC530FE6C9A1EAE985B /* TFTPServiceManagerTests.swift */; };
+		65921A313D43767471FAF546 /* ClientIPCaptureServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3A1733BE8C98C3B30F4BEBA /* ClientIPCaptureServiceTests.swift */; };
 		6ED503619E0AED9D9007FD0C /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 783881C1CB286CD1D2871239 /* AppState.swift */; };
 		76F835D5E0BD56D6EBD52351 /* TFTPServiceControlling.swift in Sources */ = {isa = PBXBuildFile; fileRef = 09973E3318EA41ECE42C1ACB /* TFTPServiceControlling.swift */; };
 		7D828505571C8767697E8CC2 /* HelpTopic.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D764A5401DB27CFE1BF1E45 /* HelpTopic.swift */; };
@@ -89,6 +91,7 @@
 		976EBD5BE7CC32BBBF326876 /* SystemDetectorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemDetectorTests.swift; sourceTree = "<group>"; };
 		981CBE6B1B7D8DD8EDBDAF9D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		9EFB7D05A6CBD7CE76DBAA62 /* OrphanedServerBlockingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrphanedServerBlockingView.swift; sourceTree = "<group>"; };
+		A3F074F4E8F662B88F9F6422 /* ClientIPCaptureService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClientIPCaptureService.swift; sourceTree = "<group>"; };
 		A46F7C33827CEE196606A676 /* FileSystemService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileSystemService.swift; sourceTree = "<group>"; };
 		A49F72BEDAAAD82C092433C2 /* ProcessRunner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProcessRunner.swift; sourceTree = "<group>"; };
 		B32319C18B339D04F9CC1AD2 /* LogEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogEntry.swift; sourceTree = "<group>"; };
@@ -102,6 +105,7 @@
 		D85D9798E7B7D80FBAB19C2B /* DashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardView.swift; sourceTree = "<group>"; };
 		DADB1F11C9FA20CCE7024445 /* TFTPStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TFTPStatus.swift; sourceTree = "<group>"; };
 		DAF66CDDA2A63D8B701C6CBA /* TFTPServerApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TFTPServerApp.swift; sourceTree = "<group>"; };
+		F3A1733BE8C98C3B30F4BEBA /* ClientIPCaptureServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClientIPCaptureServiceTests.swift; sourceTree = "<group>"; };
 		FBB03C064204B87DB457A8BC /* NativeTFTPService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeTFTPService.swift; sourceTree = "<group>"; };
 		FBBC7FF04059E3C3409F3371 /* TFTPServer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TFTPServer.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		FC1544B44B1F82D5341D3053 /* FileEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileEntry.swift; sourceTree = "<group>"; };
@@ -197,6 +201,7 @@
 		D458B5532E7EF3199DD12740 /* Infrastructure */ = {
 			isa = PBXGroup;
 			children = (
+				A3F074F4E8F662B88F9F6422 /* ClientIPCaptureService.swift */,
 				A46F7C33827CEE196606A676 /* FileSystemService.swift */,
 				57B57B1C5DCD33400FF8D8A6 /* LaunchdManager.swift */,
 				C96261C42F370C392FC123E3 /* LogStreamMonitor.swift */,
@@ -215,6 +220,7 @@
 			isa = PBXGroup;
 			children = (
 				5C6A7658E15C957F34DB4123 /* AppStateStartGateTests.swift */,
+				F3A1733BE8C98C3B30F4BEBA /* ClientIPCaptureServiceTests.swift */,
 				6D4E02763D6A8BC46BAFE66A /* FileSystemServiceTests.swift */,
 				7D8E3D11CD47B31ABD5E1FA4 /* PathValidatorTests.swift */,
 				976EBD5BE7CC32BBBF326876 /* SystemDetectorTests.swift */,
@@ -320,6 +326,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				55B0B1E117FE8FAAAA39BCE3 /* AppStateStartGateTests.swift in Sources */,
+				65921A313D43767471FAF546 /* ClientIPCaptureServiceTests.swift in Sources */,
 				B6E8233E3DE2F1A42E25BDAF /* FileSystemServiceTests.swift in Sources */,
 				411B2D7FF701F0BE0DB436D8 /* PathValidatorTests.swift in Sources */,
 				895FAB784A5D7208EB533C53 /* SystemDetectorTests.swift in Sources */,
@@ -335,6 +342,7 @@
 				C15FA63F29D4B77E71AB2E39 /* ActiveTransfersPanel.swift in Sources */,
 				C909E3CEF22A46D3565BDD49 /* AppDelegate.swift in Sources */,
 				6ED503619E0AED9D9007FD0C /* AppState.swift in Sources */,
+				52A6DD0470EC6E2F315E49A5 /* ClientIPCaptureService.swift in Sources */,
 				DFD14BA2CDD7CF555B80C03D /* CurrentPathView.swift in Sources */,
 				14D64DFF7B5D8A8AC0D7A512 /* DashboardView.swift in Sources */,
 				AA4D6B36E1D9DA660C5F9872 /* FileEntry.swift in Sources */,
