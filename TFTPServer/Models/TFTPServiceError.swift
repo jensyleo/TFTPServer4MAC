@@ -17,6 +17,7 @@ enum TFTPServiceError: Error, Equatable {
     case requiresUserApproval
     case firewallIssue
     case permissionsRepairFailed
+    case permissionsMustBeFixedFirst
     case unknown
 
     var userFacingMessage: String {
@@ -32,7 +33,7 @@ enum TFTPServiceError: Error, Equatable {
         case .serviceStopFailed:
             return "The TFTP service could not be stopped."
         case .rootDirectoryInvalid:
-            return "The selected TFTP folder is not valid or not accessible."
+            return "That folder can't be used as the TFTP folder. It must be a real, readable folder of your own — not the entire disk (\"/\"), a top-level folder like /Users or /Applications, a system folder, or a path containing \"..\"."
         case .conflictingSystemService:
             return "macOS's built-in TFTP service is already loaded and must be stopped first."
         case .requiresUserApproval:
@@ -41,6 +42,8 @@ enum TFTPServiceError: Error, Equatable {
             return "The firewall may be blocking incoming TFTP traffic."
         case .permissionsRepairFailed:
             return "Couldn't fix this folder's permissions — it may belong to a different user. Try fixing it from Terminal or Finder's Get Info panel."
+        case .permissionsMustBeFixedFirst:
+            return "The server can't start until the permission issues shown below are fixed. Use the \"Fix\" button next to whichever one says \"Fix needed\", then try Start again."
         case .unknown:
             return "An unknown error occurred."
         }

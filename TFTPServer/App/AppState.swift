@@ -201,7 +201,17 @@ final class AppState: ObservableObject {
         refreshFiles()
     }
 
+    /// El usuario pidió (2026-09-08) que el servidor no pueda arrancar
+    /// mientras la carpeta TFTP o su padre tengan un problema de permisos
+    /// sin resolver — en vez de arrancar igual y fallar de forma menos
+    /// clara más adelante (o servir desde una carpeta a medio verificar).
     func start() async {
+        refreshPermissions()
+        guard workingPathPermissionsOK, parentFolderPermissionsOK else {
+            lastError = .permissionsMustBeFixedFirst
+            return
+        }
+
         do {
             // `AppState.configuration` (root elegido con "Change Path", flags
             // de Settings) vive solo aquí — el actor `NativeTFTPService`
