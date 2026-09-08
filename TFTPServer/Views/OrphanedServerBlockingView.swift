@@ -13,6 +13,13 @@ import SwiftUI
 struct OrphanedServerBlockingView: View {
     @EnvironmentObject private var appState: AppState
     @State private var isResolving = false
+    /// Pedido del usuario (2026-09-08): "Quit App" cerraba la app dejando el
+    /// servidor huérfano corriendo, sin ninguna advertencia — inconsistente
+    /// con el propósito de esta pantalla entera (nunca un daemon huérfano en
+    /// silencio). No se bloquea la opción (sigue siendo válida para "ahora
+    /// no quiero resolver esto"), pero ahora exige una confirmación
+    /// explícita que dice exactamente qué va a quedar corriendo.
+    @State private var isShowingQuitConfirmation = false
 
     var body: some View {
         VStack(spacing: 16) {
@@ -57,6 +64,14 @@ struct OrphanedServerBlockingView: View {
             .disabled(isResolving)
 
             Button("Quit App") {
+                isShowingQuitConfirmation = true
+            }
+        }
+        .padding(32)
+        .frame(width: 380)
+        .interactiveDismissDisabled()
+        .alert("The Server Will Keep Running", isPresented: $isShowingQuitConfirmation) {
+            Button("Quit Anyway", role: .destructive) {
                 // NSApp.terminate(nil) dispararía de nuevo
                 // AppDelegate.applicationShouldTerminate, que intentaría
                 // detener el servidor huérfano y pediría otra autorización —
@@ -65,10 +80,10 @@ struct OrphanedServerBlockingView: View {
                 // hook (bug reportado 2026-09-04).
                 exit(0)
             }
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text("Quitting without stopping it leaves this unauthenticated TFTP server active and reachable on your network until you reopen the app and stop it, or restart this Mac.")
         }
-        .padding(32)
-        .frame(width: 380)
-        .interactiveDismissDisabled()
     }
 }
 
