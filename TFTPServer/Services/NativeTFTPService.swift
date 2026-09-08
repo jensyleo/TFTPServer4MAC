@@ -40,6 +40,56 @@ actor NativeTFTPService: TFTPServiceControlling {
     }
 
     func start() async throws {
+        try await checkCanStart()
+        do {
+            try privilegedShellRunner.runElevated(startShellFragment())
+        } catch PrivilegedShellError.userCancelled {
+            throw TFTPServiceError.permissionDenied
+        } catch {
+            throw TFTPServiceError.serviceStartFailed
+        }
+
+        // launchctl load puede reportar error incluso cuando sí tuvo efecto
+        // (Fase 0) — confirmar siempre con print, nunca con el resultado de load.
+        guard try await launchdManager.isRegistered(label: Self.ownLabel) else {
+            throw TFTPServiceError.serviceStartFailed
+        }
+    }
+
+    func stop() async throws {
+        do {
+            try privilegedShellRunner.runElevated(stopShellFragment())
+        } catch PrivilegedShellError.userCancelled {
+            throw TFTPServiceError.permissionDenied
+        } catch {
+            throw TFTPServiceError.serviceStopFailed
+        }
+    }
+
+    /// Reinicia con una única autorización — feedback del usuario
+    /// (2026-09-08): activar "Show Client IP" con el servidor ya corriendo
+    /// hacía `stop()` + `start()` por separado, cada uno con su propia
+    /// elevación (`do shell script ... with administrator privileges`),
+    /// pidiendo la contraseña/Touch ID dos veces para lo que es
+    /// conceptualmente una sola operación. Combinar ambos fragmentos en un
+    /// solo `runElevated` reduce eso a una autorización.
+    func restart() async throws {
+        try await checkCanStart()
+        let combinedCommand = stopShellFragment() + "\n" + startShellFragment()
+        do {
+            try privilegedShellRunner.runElevated(combinedCommand)
+        } catch PrivilegedShellError.userCancelled {
+            throw TFTPServiceError.permissionDenied
+        } catch {
+            throw TFTPServiceError.serviceStartFailed
+        }
+
+        guard try await launchdManager.isRegistered(label: Self.ownLabel) else {
+            throw TFTPServiceError.serviceStartFailed
+        }
+    }
+
+    private func checkCanStart() async throws {
         let capabilities = systemDetector.detectCapabilities()
         guard capabilities.tftpdAvailable else {
             throw TFTPServiceError.tftpdNotFound
@@ -55,67 +105,40 @@ actor NativeTFTPService: TFTPServiceControlling {
         if try await launchdManager.isRegistered(label: Self.appleLabel) {
             throw TFTPServiceError.conflictingSystemService
         }
+    }
 
-        // El plist viaja codificado en base64 en vez de en un heredoc de
-        // shell (vulnerabilidad real corregida, 2026-09-07, auditoría de
-        // seguridad): un heredoc con delimitador sin comillas simples
-        // permite expansión de variables/comandos, y aun con el delimitador
-        // entre comillas simples ('TFTPSERVER_PLIST_EOF', como estaba antes)
-        // seguía siendo posible terminarlo antes de tiempo si el contenido
-        // (en la práctica, `root.path`) contuviera un salto de línea seguido
-        // exactamente de ese delimitador — inyectando comandos arbitrarios
-        // ejecutados como administrador. base64 solo produce el alfabeto
-        // [A-Za-z0-9+/=], sin metacaracteres de shell ni saltos de línea
-        // relevantes, así que esta clase de inyección queda cerrada sin
-        // importar el contenido del plist.
+    /// El plist viaja codificado en base64 en vez de en un heredoc de shell
+    /// (vulnerabilidad real corregida, 2026-09-07, auditoría de seguridad):
+    /// un heredoc con delimitador sin comillas simples permite expansión de
+    /// variables/comandos, y aun con el delimitador entre comillas simples
+    /// ('TFTPSERVER_PLIST_EOF', como estaba antes) seguía siendo posible
+    /// terminarlo antes de tiempo si el contenido (en la práctica,
+    /// `root.path`) contuviera un salto de línea seguido exactamente de ese
+    /// delimitador — inyectando comandos arbitrarios ejecutados como
+    /// administrador. base64 solo produce el alfabeto [A-Za-z0-9+/=], sin
+    /// metacaracteres de shell ni saltos de línea relevantes, así que esta
+    /// clase de inyección queda cerrada sin importar el contenido del plist.
+    private func startShellFragment() -> String {
         let plistXML = Self.plistContents(root: currentConfiguration.rootDirectory)
         let plistBase64 = Data(plistXML.utf8).base64EncodedString()
-        // La captura de IP (si está activa) se arranca en esta MISMA
-        // elevación — una sola autorización cubre ambas cosas. Si el
-        // usuario la activa con el servidor ya corriendo, eso pasa por
-        // `restart()`/una nueva llamada a `start()`, que sí pediría su
-        // propia autorización — inevitable, pero solo en ese caso puntual.
         let captureFragment = currentConfiguration.isClientIPCaptureEnabled
             ? "\n" + ClientIPCaptureService.startCaptureShellFragment()
             : ""
-        let writeAndLoadCommand = """
+        return """
         echo \(plistBase64) | base64 -D -o \(Self.ownPlistPath)
         launchctl load -w \(Self.ownPlistPath)\(captureFragment)
         """
-
-        do {
-            try privilegedShellRunner.runElevated(writeAndLoadCommand)
-        } catch PrivilegedShellError.userCancelled {
-            throw TFTPServiceError.permissionDenied
-        } catch {
-            throw TFTPServiceError.serviceStartFailed
-        }
-
-        // launchctl load puede reportar error incluso cuando sí tuvo efecto
-        // (Fase 0) — confirmar siempre con print, nunca con el resultado de load.
-        guard try await launchdManager.isRegistered(label: Self.ownLabel) else {
-            throw TFTPServiceError.serviceStartFailed
-        }
     }
 
-    func stop() async throws {
-        // La limpieza de la captura de IP se intenta siempre, esté activa o
-        // no — es inofensiva si nunca se inició (el `if -f` de adentro no
-        // hace nada si el pidfile no existe) y evita depender de que
-        // `currentConfiguration` siga reflejando lo que de verdad se lanzó.
-        let unloadCommand = """
+    /// La limpieza de la captura de IP se intenta siempre, esté activa o
+    /// no — es inofensiva si nunca se inició y evita depender de que
+    /// `currentConfiguration` siga reflejando lo que de verdad se lanzó.
+    private func stopShellFragment() -> String {
+        """
         launchctl unload -w \(Self.ownPlistPath)
         rm -f \(Self.ownPlistPath)
         \(ClientIPCaptureService.stopCaptureShellFragment())
         """
-
-        do {
-            try privilegedShellRunner.runElevated(unloadCommand)
-        } catch PrivilegedShellError.userCancelled {
-            throw TFTPServiceError.permissionDenied
-        } catch {
-            throw TFTPServiceError.serviceStopFailed
-        }
     }
 
     func status() async -> TFTPStatus {

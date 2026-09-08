@@ -11,8 +11,11 @@ struct TFTPConfiguration: Equatable, Sendable {
     /// Activa la captura acotada de IP de origen (ver
     /// `ClientIPCaptureService`) — se decide antes de pulsar Start para
     /// aplicarse en la misma elevación; cambiarlo con el servidor ya
-    /// corriendo requiere su propia autorización.
-    var isClientIPCaptureEnabled: Bool = false
+    /// corriendo requiere su propia autorización (aunque ahora es una sola,
+    /// ver `NativeTFTPService.restart`). Activada por defecto (2026-09-08,
+    /// pedido del usuario) — saber de dónde viene cada transferencia es
+    /// más útil que el costo mínimo de la captura acotada por sí sola.
+    var isClientIPCaptureEnabled: Bool = true
 
     static var conservativeDefault: TFTPConfiguration {
         let defaultRoot = FileManager.default

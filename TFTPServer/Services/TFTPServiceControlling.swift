@@ -9,6 +9,10 @@ import Foundation
 protocol TFTPServiceControlling: Sendable {
     func start() async throws
     func stop() async throws
+    /// Detiene y arranca de nuevo con una sola autorización — usado cuando
+    /// hay que aplicar un cambio de configuración con el servidor ya
+    /// corriendo (ver `NativeTFTPService.restart`).
+    func restart() async throws
     func status() async -> TFTPStatus
     func updateConfiguration(_ configuration: TFTPConfiguration) async throws
 }

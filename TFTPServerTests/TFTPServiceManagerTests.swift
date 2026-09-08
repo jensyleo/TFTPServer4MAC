@@ -14,6 +14,25 @@ private struct FakePrivilegedShellRunner: PrivilegedShellRunning {
     }
 }
 
+/// Cuenta cuántas veces se pidió una elevación — usado para confirmar que
+/// `restart()` combina detener y arrancar en una sola llamada (bug real
+/// reportado en vivo, 2026-09-08: pedía la contraseña dos veces).
+private final class RecordingPrivilegedShellRunner: PrivilegedShellRunning, @unchecked Sendable {
+    private let lock = NSLock()
+    private var _callCount = 0
+    var callCount: Int {
+        lock.lock()
+        defer { lock.unlock() }
+        return _callCount
+    }
+
+    func runElevated(_ shellCommand: String) throws {
+        lock.lock()
+        _callCount += 1
+        lock.unlock()
+    }
+}
+
 final class TFTPServiceManagerTests: XCTestCase {
     func testStartRejectsInvalidRootBeforeElevating() async {
         // No debe pedir privilegios si el root ya es inválido: falla rápido y
@@ -48,6 +67,19 @@ final class TFTPServiceManagerTests: XCTestCase {
         } catch {
             XCTFail("Unexpected error: \(error)")
         }
+    }
+
+    func testRestartUsesASingleAuthorization() async {
+        let runner = RecordingPrivilegedShellRunner()
+        let service = NativeTFTPService(privilegedShellRunner: runner)
+
+        // `restart()` still fails overall here — the fake runner doesn't
+        // actually load anything, so the real `launchctl print` check at
+        // the end correctly reports "not registered". That's fine: this
+        // test only cares whether `runElevated` was called once, not twice.
+        _ = try? await service.restart()
+
+        XCTAssertEqual(runner.callCount, 1)
     }
 
     func testUpdateConfigurationRejectsInvalidRoot() async {

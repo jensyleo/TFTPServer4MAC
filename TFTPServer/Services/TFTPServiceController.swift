@@ -24,6 +24,10 @@ final class TFTPServiceController: Sendable {
         try await service.stop()
     }
 
+    func restart() async throws {
+        try await service.restart()
+    }
+
     func status() async -> TFTPStatus {
         await service.status()
     }
