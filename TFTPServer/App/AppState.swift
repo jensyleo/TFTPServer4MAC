@@ -8,6 +8,13 @@ import Foundation
 
 @MainActor
 final class AppState: ObservableObject {
+    /// Sin tope, `logEntries`/`transfers` crecerían sin límite durante toda
+    /// la vida de la app — una sesión larga con muchas transferencias podría
+    /// acumular decenas de miles de entradas, degradando el `List`/`Table`
+    /// que las muestra. Pedido del usuario (2026-09-08): revisar que exista
+    /// algún límite, no necesariamente un toggle para desactivar el log.
+    private static let maxLogEntries = 5000
+    private static let maxTransferHistory = 1000
     @Published var serverStatus: TFTPStatus = .unknown
     @Published var configuration: TFTPConfiguration
     @Published var networkInterfaces: [NetworkInterface] = []
@@ -287,8 +294,33 @@ final class AppState: ObservableObject {
     func toggleClientIPCapture() async {
         configuration.isClientIPCaptureEnabled.toggle()
         guard serverStatus == .running else { return }
-        await stop()
-        await start()
+
+        // `serviceController.restart()` combina detener y arrancar en una
+        // sola autorización (ver `NativeTFTPService.restart`) — antes esto
+        // llamaba `stop()` + `start()` por separado, pidiendo la
+        // contraseña/Touch ID dos veces (bug real reportado en vivo,
+        // 2026-09-08). El resto replica lo que esos dos métodos hacían por
+        // su cuenta (detener el sondeo de transferencias, reiniciar el
+        // stream de logs).
+        logStreamMonitor.stop()
+        trackingTasks.values.forEach { $0.cancel() }
+        trackingTasks.removeAll()
+
+        do {
+            try await serviceController.updateConfiguration(configuration)
+            try await serviceController.restart()
+            log(.application, "Server restarted to apply Show Client IP")
+            consumedClientIPLines = 0
+            logStreamMonitor.start { [weak self] line in
+                self?.handleActivityLine(line)
+            }
+        } catch let error as TFTPServiceError {
+            lastError = error
+            log(.application, "Restart failed: \(error.userFacingMessage)")
+        } catch {
+            lastError = .unknown
+        }
+        await refreshStatus()
     }
 
     func cancelTransfer(pid: Int32) async {
@@ -316,6 +348,9 @@ final class AppState: ObservableObject {
 
     private func log(_ source: LogSource, _ message: String) {
         logEntries.append(LogEntry(date: Date(), source: source, message: message))
+        if logEntries.count > Self.maxLogEntries {
+            logEntries.removeFirst(logEntries.count - Self.maxLogEntries)
+        }
     }
 
     private func handleActivityLine(_ line: String) {
@@ -481,5 +516,8 @@ final class AppState: ObservableObject {
             duration: transfer.elapsedSeconds
         )
         transfers.insert(record, at: 0)
+        if transfers.count > Self.maxTransferHistory {
+            transfers.removeLast(transfers.count - Self.maxTransferHistory)
+        }
     }
 }
