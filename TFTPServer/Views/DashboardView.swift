@@ -138,17 +138,38 @@ struct DashboardView: View {
             HStack(spacing: 4) {
                 Text("Interface:")
                     .foregroundStyle(.secondary)
-                Picker("", selection: $appState.selectedInterfaceID) {
+                // Un `Picker` nativo trae su propio relleno interno fijo
+                // que ningún `spacing` externo logra reducir (probado en
+                // vivo, 2026-09-08: ni `.labelsHidden()` ni
+                // `.pickerStyle(.menu)` cambiaron el espacio real).  Un
+                // `Menu` con una etiqueta propia da control total sobre el
+                // padding, igual que el recuadro de "Path:".
+                Menu {
                     ForEach(appState.networkInterfaces) { interface in
-                        Text("\(interface.displayName): \(interface.ipv4Address ?? "—")")
-                            .tag(Optional(interface.id))
+                        Button("\(interface.displayName): \(interface.ipv4Address ?? "—")") {
+                            appState.selectedInterfaceID = interface.id
+                        }
                     }
+                } label: {
+                    Text(selectedInterfaceLabel)
+                        .lineLimit(1)
                 }
-                .frame(maxWidth: 260)
+                .menuStyle(.borderlessButton)
+                .padding(.vertical, 6)
+                .padding(.horizontal, 10)
+                .background(.quaternary, in: RoundedRectangle(cornerRadius: 6))
+                .frame(maxWidth: 260, alignment: .leading)
             }
         }
         .padding(.horizontal)
         .padding(.top, 12)
+    }
+
+    private var selectedInterfaceLabel: String {
+        guard let selected = appState.networkInterfaces.first(where: { $0.id == appState.selectedInterfaceID }) else {
+            return "—"
+        }
+        return "\(selected.displayName): \(selected.ipv4Address ?? "—")"
     }
 
     private func presentChangePathPanel() {
