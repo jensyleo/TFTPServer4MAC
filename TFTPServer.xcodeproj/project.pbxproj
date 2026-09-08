@@ -43,6 +43,7 @@
 		C3B5F9C57FE99985B8745FD5 /* TFTPServerApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = DAF66CDDA2A63D8B701C6CBA /* TFTPServerApp.swift */; };
 		C6C47E91042DB3B4D249AA02 /* TransferActivityParserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF0178C62A46B1F4E9D68B91 /* TransferActivityParserTests.swift */; };
 		C909E3CEF22A46D3565BDD49 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 61A05B78422CCF87BB43C3EF /* AppDelegate.swift */; };
+		CD69BE2EDF50118F57EBC217 /* PermissionsNeededView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42BA31023D0A63DF4A5143D2 /* PermissionsNeededView.swift */; };
 		CF77CB6D9E4F9E80101D7049 /* LogEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = B32319C18B339D04F9CC1AD2 /* LogEntry.swift */; };
 		DEB6C250662F3820925BA44C /* TFTPServiceController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D0537F7734BA5967CF3CC0E /* TFTPServiceController.swift */; };
 		DFD14BA2CDD7CF555B80C03D /* CurrentPathView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC5ADD68E5DFC50D32B07761 /* CurrentPathView.swift */; };
@@ -68,6 +69,7 @@
 		348ADAC0ECAFC258D0F02083 /* PathValidator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PathValidator.swift; sourceTree = "<group>"; };
 		3800458F842A745CDA22823D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		41D3642D336C5578F8868245 /* NetworkMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkMonitor.swift; sourceTree = "<group>"; };
+		42BA31023D0A63DF4A5143D2 /* PermissionsNeededView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PermissionsNeededView.swift; sourceTree = "<group>"; };
 		463B279DEBBD1707AA2A6052 /* LogViewerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogViewerView.swift; sourceTree = "<group>"; };
 		483FAAFA556BDC3132CA069B /* TFTPServiceError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TFTPServiceError.swift; sourceTree = "<group>"; };
 		57B57B1C5DCD33400FF8D8A6 /* LaunchdManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchdManager.swift; sourceTree = "<group>"; };
@@ -168,6 +170,7 @@
 				954ACEAA702EF3D4EA8D0BE9 /* HelpView.swift */,
 				463B279DEBBD1707AA2A6052 /* LogViewerView.swift */,
 				9EFB7D05A6CBD7CE76DBAA62 /* OrphanedServerBlockingView.swift */,
+				42BA31023D0A63DF4A5143D2 /* PermissionsNeededView.swift */,
 				FE7F82F877138ACD8303A347 /* StatusBarView.swift */,
 				D482F8DA6079935F22106E00 /* TransfersView.swift */,
 			);
@@ -348,6 +351,7 @@
 				A5D8AC06575528683FE5676C /* NetworkMonitor.swift in Sources */,
 				2498045B441153233084DDF7 /* OrphanedServerBlockingView.swift in Sources */,
 				C1ABF1BEC0A6165AC1B84471 /* PathValidator.swift in Sources */,
+				CD69BE2EDF50118F57EBC217 /* PermissionsNeededView.swift in Sources */,
 				11F01264E3AC72B006E0DC9D /* PrivilegedShellRunner.swift in Sources */,
 				52803F0789E0B806AC1E390B /* ProcessKiller.swift in Sources */,
 				E263B2F6F2B83D968E78278E /* ProcessRunner.swift in Sources */,

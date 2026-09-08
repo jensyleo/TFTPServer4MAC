@@ -65,6 +65,20 @@ enum PathValidator {
             return false
         }
 
-        return fileManager.isReadableFile(atPath: standardizedPath)
+        // Deliberadamente NO se revisa `isReadableFile` aquí (bug real
+        // encontrado en vivo, 2026-09-08): esta función valida si una ruta
+        // es *estructuralmente* segura como root (no es traversal, no es
+        // una ruta del sistema, no es "/" ni una carpeta de primer nivel),
+        // no si sus permisos están bien ahora mismo. Antes rechazaba
+        // cualquier carpeta sin permiso de lectura con el error genérico
+        // "carpeta inválida" — eso le ganaba de mano a `PermissionsNeededView`
+        // (el popup con el botón "Fix"), que nunca llegaba a mostrarse
+        // porque `changeRootDirectory` ya había fallado en este `guard`. Los
+        // problemas de lectura son arreglables (botón "Fix"); los
+        // estructurales de arriba no lo son — por eso viven en funciones
+        // separadas: `isValidRoot` (aquí) decide si la ruta puede aceptarse
+        // como configuración; `AppState.refreshPermissions`/`start()` deciden
+        // si el servidor puede arrancar de verdad con lo que hay ahí.
+        return true
     }
 }

@@ -30,6 +30,15 @@ final class AppState: ObservableObject {
     /// usuario autorice detenerlo, por decisión explícita del usuario
     /// (2026-09-04): nunca continuar en silencio con un daemon huérfano.
     @Published var isBlockedByOrphanedServer = false
+    /// Se activa justo después de elegir una carpeta nueva con "Change Path"
+    /// si esa carpeta (o su padre) tiene un problema de permisos — en vez de
+    /// depender de que el usuario mire la barra de estado inferior. Pedido
+    /// del usuario (2026-09-08) tras ver un caso confuso: cambiar de ruta
+    /// con el servidor ya corriendo deja "Running" (el daemon sigue sirviendo
+    /// la carpeta ANTERIOR hasta un Stop/Start) al lado de "Fix needed" (ya
+    /// describiendo la carpeta nueva) — sin este aviso, es fácil no notar el
+    /// problema hasta intentar reiniciar el servidor.
+    @Published var isShowingPermissionsNeededPrompt = false
 
     private let serviceController: TFTPServiceController
     private let networkMonitor = NetworkMonitor()
@@ -171,6 +180,7 @@ final class AppState: ObservableObject {
             return
         }
         refreshPermissions()
+        dismissPermissionsPromptIfResolved()
     }
 
     /// Mismo botón, para "Parent folder permissions".
@@ -181,6 +191,13 @@ final class AppState: ObservableObject {
             return
         }
         refreshPermissions()
+        dismissPermissionsPromptIfResolved()
+    }
+
+    private func dismissPermissionsPromptIfResolved() {
+        if workingPathPermissionsOK, parentFolderPermissionsOK {
+            isShowingPermissionsNeededPrompt = false
+        }
     }
 
     func changeRootDirectory(to url: URL) {
@@ -192,6 +209,9 @@ final class AppState: ObservableObject {
         log(.application, "TFTP root changed to \(url.path)")
         refreshFiles()
         refreshPermissions()
+        if !workingPathPermissionsOK || !parentFolderPermissionsOK {
+            isShowingPermissionsNeededPrompt = true
+        }
     }
 
     func createEmptyFile(named name: String) {

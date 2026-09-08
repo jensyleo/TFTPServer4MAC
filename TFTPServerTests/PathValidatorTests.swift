@@ -57,4 +57,24 @@ final class PathValidatorTests: XCTestCase {
         // casualidad de la ruta.
         XCTAssertTrue(PathValidator.isValidRoot(base))
     }
+
+    /// Bug real encontrado en vivo (2026-09-08): `isValidRoot` rechazaba
+    /// cualquier carpeta sin permiso de lectura con el error genérico
+    /// "carpeta inválida" — eso le ganaba de mano al popup con el botón
+    /// "Fix" (`PermissionsNeededView`), que nunca llegaba a mostrarse porque
+    /// `changeRootDirectory` ya había fallado antes. Los problemas de
+    /// lectura deben resolverse con "Fix" (ver `AppStateStartGateTests`),
+    /// no bloquear la sola selección de la carpeta.
+    func testAcceptsStructurallyValidDirectoryEvenIfUnreadable() throws {
+        let base = FileManager.default.temporaryDirectory
+            .appendingPathComponent("PathValidatorTests-\(UUID().uuidString)")
+        try FileManager.default.createDirectory(at: base, withIntermediateDirectories: true)
+        defer {
+            try? FileManager.default.setAttributes([.posixPermissions: 0o755], ofItemAtPath: base.path)
+            try? FileManager.default.removeItem(at: base)
+        }
+        try FileManager.default.setAttributes([.posixPermissions: 0o000], ofItemAtPath: base.path)
+
+        XCTAssertTrue(PathValidator.isValidRoot(base))
+    }
 }

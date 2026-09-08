@@ -104,6 +104,9 @@ struct DashboardView: View {
         .sheet(isPresented: $appState.isBlockedByOrphanedServer) {
             OrphanedServerBlockingView()
         }
+        .sheet(isPresented: $appState.isShowingPermissionsNeededPrompt) {
+            PermissionsNeededView()
+        }
     }
 
     private var pathAndInterfaceBar: some View {
