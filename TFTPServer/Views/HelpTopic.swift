@@ -132,6 +132,7 @@ enum HelpLibrary {
             HelpSection(rows: [
                 .init(term: "No control over client-negotiated options", detail: "Block size, timeout, and retry count are chosen by the requesting device, not configurable from this app — the native daemon accepts what the client asks for."),
                 .init(term: "No per-IP allow/deny list", detail: "macOS's `tftpd` has no such feature; enforcing this would require separate firewall rules, which this app does not manage."),
+                .init(term: "Large files may fail against real embedded clients", detail: "RFC 1350's 16-bit block number caps a standard transfer at about 32MB. Going further requires a non-standard \"block rollover\" extension — many TFTP clients built into routers, switches, and PXE boot ROMs (this app's own target use case) don't implement it. A firmware file over ~32MB may fail or behave unpredictably against such a device even though it transfers perfectly with a modern desktop TFTP client."),
             ]),
         ]),
         HelpTopic(id: "troubleshooting", title: "Troubleshooting", symbol: "wrench.and.screwdriver", sections: [
