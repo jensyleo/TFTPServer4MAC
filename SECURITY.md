@@ -13,15 +13,16 @@ None of this is specific to this app or to macOS's implementation — it is inhe
 
 ## What this app does to reduce risk
 
-- **Read-only by default.** New file creation requires explicitly enabling uploads; even then, macOS's native daemon still allows overwriting an existing, publicly-writable file — see the in-app Help for the exact limitation.
+- **Uploads only overwrite, never create.** There is no setting to enable uploads — the native daemon only allows overwriting a file that already exists in the TFTP folder and is writable by everyone. A device can never cause a brand-new file to appear.
 - **No persistent exposure.** The TFTP service is only active between Start and Stop. Stopping (including an automatic stop on quit, or an orphaned-server check on the next launch after a crash) removes the service registration entirely — nothing keeps listening in the background.
 - **Least privilege for transfers.** The actual file-transfer process runs under your own user account, not root, minimizing what a successful attack against it could reach.
 - **No telemetry, no network calls beyond the TFTP service itself.** The app makes no external connections and collects no usage data.
+- **Optional client IP visibility.** An opt-out toggle captures only the first packet of each request (never the transfer's actual data) so you can see which device is talking to the server — off requires no extra step, and turning it on before Start needs no separate authorization beyond Start's own.
+- **Folder root can't be the entire disk.** The configured TFTP folder is validated to reject the filesystem root, top-level folders, system paths, and directory traversal — a misconfiguration can never expose more than one specific folder.
 
 ## What you should do
 
 - **Only run this on trusted, isolated networks** — a lab network, an isolated VLAN, or a direct link to the device you're configuring. Never expose UDP port 69 to the open internet.
-- **Keep uploads disabled** unless you specifically intend to receive files from a device.
 - **Don't make files in the TFTP folder writable by everyone** unless you intend for them to be overwritten by any device that can reach the service.
 - **Stop the server when you're done** — don't leave it running longer than the task requires.
 

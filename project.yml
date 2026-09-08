@@ -28,6 +28,8 @@ targets:
       path: TFTPServer/Info.plist
       properties:
         LSApplicationCategoryType: public.app-category.utilities
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
   TFTPServerTests:
     type: bundle.unit-test
     platform: macOS

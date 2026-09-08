@@ -18,11 +18,13 @@ TFTP is still the standard way to push firmware and configuration files to netwo
 
 - **Native `tftpd`, not a reimplementation** — uses Apple's own daemon via a temporary LaunchDaemon, loaded and unloaded on demand.
 - **No persistent system registration** — Start/Stop use a one-time native macOS administrator authorization dialog (Touch ID or password), never Terminal `sudo`. Stop removes every trace; nothing is left running in the background after you quit or stop.
+- **Genuine concurrent transfers** — the native daemon really does serve more than one device at once; each active transfer gets its own card with real, independent progress, speed, and a Cancel button, in two separate panels for downloads and uploads.
 - **Real transfer progress** — live percentage, speed, and estimated time remaining, read directly from the transferring process's actual network bytes (not simulated).
+- **Optional client IP display** — see which device made each request, captured narrowly (only the first packet of each request) and folded into the same one-time authorization as Start.
 - **Cancel without re-authorizing** — the transfer process runs as your own user, not root, so cancelling is instant.
+- **Folder permission repair** — a one-click "Fix" for the most common setup mistake (an unreadable TFTP folder or parent), with no extra authorization needed.
 - **Orphaned-server protection** — if the app is force-quit while the server is running, the next launch requires you to explicitly stop the leftover daemon before continuing.
-- **Queue progress** — track how many of the files in a folder have been requested at least once, in readable batches of 10.
-- **Transfer history** — a running log of every transfer this session: filename, direction, size, status, duration.
+- **Transfer history** — a running log of every transfer this session: filename, direction, client IP, size, status, duration.
 - **Built-in Help** — a searchable in-app Help window covering usage, security, and the relevant parts of the TFTP protocol (RFC 1350 and its extensions).
 
 ## Requirements
