@@ -23,7 +23,7 @@ final class AppStateStartGateTests: XCTestCase {
         }
         try FileManager.default.setAttributes([.posixPermissions: 0o000], ofItemAtPath: tempDir.path)
 
-        let appState = AppState()
+        let appState = AppState(defaults: UserDefaults(suiteName: UUID().uuidString)!)
         appState.configuration.rootDirectory = tempDir
 
         await appState.start()

@@ -15,6 +15,7 @@
 		16FC6F44B5CE138647AD7867 /* TFTPStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = DADB1F11C9FA20CCE7024445 /* TFTPStatus.swift */; };
 		2498045B441153233084DDF7 /* OrphanedServerBlockingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EFB7D05A6CBD7CE76DBAA62 /* OrphanedServerBlockingView.swift */; };
 		281C2F7AE449480492D7CB63 /* StatusBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE7F82F877138ACD8303A347 /* StatusBarView.swift */; };
+		2F0F53E49CF659931C7F6E03 /* ConfigurationPersistenceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C50C7BD2076CED174B039AF3 /* ConfigurationPersistenceTests.swift */; };
 		411B2D7FF701F0BE0DB436D8 /* PathValidatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D8E3D11CD47B31ABD5E1FA4 /* PathValidatorTests.swift */; };
 		45052B23DCA7F6CF8FF2853B /* TransferProgress.swift in Sources */ = {isa = PBXBuildFile; fileRef = C59BE1C1D166A9B47DA9E15F /* TransferProgress.swift */; };
 		4AFED5128E632C74FB204180 /* TransfersView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D482F8DA6079935F22106E00 /* TransfersView.swift */; };
@@ -97,6 +98,7 @@
 		B32319C18B339D04F9CC1AD2 /* LogEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogEntry.swift; sourceTree = "<group>"; };
 		BAC37DC530FE6C9A1EAE985B /* TFTPServiceManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TFTPServiceManagerTests.swift; sourceTree = "<group>"; };
 		BDDCFF5CE5CE8464CD3AC704 /* TFTPConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TFTPConfiguration.swift; sourceTree = "<group>"; };
+		C50C7BD2076CED174B039AF3 /* ConfigurationPersistenceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigurationPersistenceTests.swift; sourceTree = "<group>"; };
 		C55BC1C0E187C94BE1587B35 /* TFTPServerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TFTPServerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		C59BE1C1D166A9B47DA9E15F /* TransferProgress.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransferProgress.swift; sourceTree = "<group>"; };
 		C96261C42F370C392FC123E3 /* LogStreamMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogStreamMonitor.swift; sourceTree = "<group>"; };
@@ -221,6 +223,7 @@
 			children = (
 				5C6A7658E15C957F34DB4123 /* AppStateStartGateTests.swift */,
 				F3A1733BE8C98C3B30F4BEBA /* ClientIPCaptureServiceTests.swift */,
+				C50C7BD2076CED174B039AF3 /* ConfigurationPersistenceTests.swift */,
 				6D4E02763D6A8BC46BAFE66A /* FileSystemServiceTests.swift */,
 				7D8E3D11CD47B31ABD5E1FA4 /* PathValidatorTests.swift */,
 				976EBD5BE7CC32BBBF326876 /* SystemDetectorTests.swift */,
@@ -327,6 +330,7 @@
 			files = (
 				55B0B1E117FE8FAAAA39BCE3 /* AppStateStartGateTests.swift in Sources */,
 				65921A313D43767471FAF546 /* ClientIPCaptureServiceTests.swift in Sources */,
+				2F0F53E49CF659931C7F6E03 /* ConfigurationPersistenceTests.swift in Sources */,
 				B6E8233E3DE2F1A42E25BDAF /* FileSystemServiceTests.swift in Sources */,
 				411B2D7FF701F0BE0DB436D8 /* PathValidatorTests.swift in Sources */,
 				895FAB784A5D7208EB533C53 /* SystemDetectorTests.swift in Sources */,
@@ -442,7 +446,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 13.0;
-				MARKETING_VERSION = 1.0.1;
+				MARKETING_VERSION = 1.1.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -522,7 +526,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				MACOSX_DEPLOYMENT_TARGET = 13.0;
-				MARKETING_VERSION = 1.0.1;
+				MARKETING_VERSION = 1.1.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";

@@ -16,7 +16,9 @@ final class AppState: ObservableObject {
     private static let maxLogEntries = 5000
     private static let maxTransferHistory = 1000
     @Published var serverStatus: TFTPStatus = .unknown
-    @Published var configuration: TFTPConfiguration
+    @Published var configuration: TFTPConfiguration {
+        didSet { saveConfiguration() }
+    }
     @Published var networkInterfaces: [NetworkInterface] = []
     @Published var selectedInterfaceID: String?
     @Published var transfers: [TFTPTransfer] = []
@@ -67,10 +69,43 @@ final class AppState: ObservableObject {
     /// transferencia).
     private var consumedClientIPLines = 0
 
-    init(serviceController: TFTPServiceController = TFTPServiceController(service: NativeTFTPService())) {
+    private enum DefaultsKey {
+        static let rootPath = "rootDirectoryPath"
+        static let clientIPCapture = "clientIPCaptureEnabled"
+    }
+
+    private let defaults: UserDefaults
+
+    init(
+        serviceController: TFTPServiceController = TFTPServiceController(service: NativeTFTPService()),
+        defaults: UserDefaults = .standard
+    ) {
         self.serviceController = serviceController
-        self.configuration = .conservativeDefault
+        self.defaults = defaults
+        self.configuration = Self.loadConfiguration(from: defaults)
         log(.application, "TFTP Server launched")
+    }
+
+    /// La carpeta guardada solo se reutiliza si sigue siendo una raíz válida
+    /// (existe y pasa `PathValidator`); si fue borrada o movida, se vuelve al
+    /// valor por defecto en vez de arrancar apuntando a algo inexistente.
+    private static func loadConfiguration(from defaults: UserDefaults) -> TFTPConfiguration {
+        var config = TFTPConfiguration.conservativeDefault
+        if let path = defaults.string(forKey: DefaultsKey.rootPath) {
+            let url = URL(fileURLWithPath: path, isDirectory: true)
+            if PathValidator.isValidRoot(url) {
+                config.rootDirectory = url
+            }
+        }
+        if defaults.object(forKey: DefaultsKey.clientIPCapture) != nil {
+            config.isClientIPCaptureEnabled = defaults.bool(forKey: DefaultsKey.clientIPCapture)
+        }
+        return config
+    }
+
+    private func saveConfiguration() {
+        defaults.set(configuration.rootDirectory.path, forKey: DefaultsKey.rootPath)
+        defaults.set(configuration.isClientIPCaptureEnabled, forKey: DefaultsKey.clientIPCapture)
     }
 
     /// Progreso combinado de todas las descargas de esta sesión (en curso o
@@ -512,10 +547,32 @@ final class AppState: ObservableObject {
             transfer.totalBytes = knownDownloadSize
         }
 
-        transfer.status = .completed
+        // Antes todo proceso que terminaba se marcaba "Completed", aunque el
+        // cliente hubiera abortado a la mitad. Para descargas el total es
+        // conocido, así que si la última muestra de bytes queda claramente
+        // por debajo se marca como incompleta. La tolerancia cubre que esa
+        // muestra puede tener hasta ~un ciclo de sondeo de retraso respecto
+        // al final real (2% del total o 1s de velocidad, lo que sea mayor).
+        // Subidas no se pueden evaluar: no hay total confiable.
+        var incompletePercent: Int?
+        if transfer.direction == .download,
+           let total = transfer.totalBytes, total > 0,
+           let counts = lastByteCounts[pid] {
+            let tolerance = max(Double(total) * 0.02, transfer.speedBytesPerSecond ?? 0) + 1_048_576
+            if Double(counts.bytesOut) + tolerance < Double(total) {
+                incompletePercent = Int(Double(counts.bytesOut) / Double(total) * 100)
+                transfer.transferredBytes = counts.bytesOut
+            }
+        }
+
         transfer.endDate = Date()
-        if transfer.direction == .download, let total = transfer.totalBytes {
-            transfer.transferredBytes = total
+        if let incompletePercent {
+            transfer.status = .failed("Incomplete — only \(incompletePercent)% was sent")
+        } else {
+            transfer.status = .completed
+            if transfer.direction == .download, let total = transfer.totalBytes {
+                transfer.transferredBytes = total
+            }
         }
         activeTransfers[pid] = transfer
         lastByteCounts[pid] = nil
