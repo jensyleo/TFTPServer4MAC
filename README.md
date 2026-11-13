@@ -27,6 +27,10 @@ TFTP is still the standard way to push firmware and configuration files to netwo
 - **Transfer history** — a running log of every transfer this session: filename, direction, client IP, size, status, duration.
 - **Built-in Help** — a searchable in-app Help window covering usage, security, and the relevant parts of the TFTP protocol (RFC 1350 and its extensions).
 
+## Download
+
+Download the latest `.dmg` from the [Releases page](https://github.com/jensyleo/TFTPServer4MAC/releases/latest), open it, and drag `TFTPServer.app` to Applications.
+
 ## Requirements
 
 - macOS 13 (Ventura) or later, Apple Silicon.
